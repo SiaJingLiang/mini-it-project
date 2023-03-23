@@ -1,18 +1,19 @@
 import sqlite3
 
-conn = sqlite3.connect('test.db')
+conn = sqlite3.connect('credentials.db')
 
-conn.execute('''CREATE TABLE IF NOT EXISTS LIBRARY 
+conn.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS 
     (ID INT PRIMARY KEY   NOT NULL,
-    TITLE        TEXT   NOT NULL,
-    AUTHOR       TEXT   NOT NULL,
-    PUBLISHER    TEXT   NOT NULL);''')
+    NAME        TEXT   NOT NULL,
+    PHONE       INT    NOT NULL,
+    EMAIL       TEXT   NOT NULL,
+    OCCUPATION  TEXT   NOT NULL);''')
 
-conn.execute("INSERT INTO LIBRARY (ID,TITLE,AUTHOR,PUBLISHER) \
-    VALUES (1, 'Test', 'California', 'A1 Pic' )");
+conn.execute("INSERT INTO CREDENTIALS (ID,NAME,PHONE,EMAIL,OCCUPATION) \
+    VALUES (1211106996, 'INSANE', '0123456789', 'MAIL@GMAIL.COM', 'STUDENT')");
 
 
-cursor = conn.execute("SELECT ID, title, author, publisher from LIBRARY")
+cursor = conn.execute("SELECT ID, phone, email, occupation from LIBRARY")
 for row in cursor:
     print(row)
 
