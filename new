@@ -1,0 +1,48 @@
+import sqlite3
+conn = sqlite3.connect('credentials.db')
+c = conn.cursor()
+
+def signUp():
+    c.execute('CREATE TABLE IF NOT EXISTS CREDENTIALS (ID TEXT PRIMARY KEY NOT NULL, NAME TEXT NOT NULL, PASSWORD TEXT NOT NULL, PHONE INT NOT NULL, EMAIL TEXT NOT NULL, OCCUPATION TEXT NOT NULL)')
+    
+    id = int(input("Enter ID: "))
+    name = str(input("Enter name: "))
+    pwd = str(input("Enter password: "))
+    phone = int(input("Enter phone: "))
+    email = str(input("Enter email: "))
+    occup = str(input("Enter occupation: "))
+
+    c.execute("INSERT INTO CREDENTIALS (ID, NAME, PASSWORD, PHONE, EMAIL, OCCUPATION) VALUES(?, ?, ?, ?, ?, ?)",(id, name, pwd, phone, email, occup))
+
+    #output = c.execute("SELECT * from CREDENTIALS")
+    #for row in output:
+    #    print(row)
+
+    conn.commit()
+    conn.close()
+
+def login():
+    id = str(input("Enter Username: "))
+    pwd = str(input("Enter password: "))
+    output = c.execute("SELECT * from CREDENTIALS")
+    for row in output:
+        print(row)
+        if id == row[0] and pwd == row[2]:
+            print('true')
+
+def menu():
+    choice=int(input("""[1]Login
+[2]Sign Up
+[3]End
+Enter your choice: """))
+    while choice < 1 or choice > 3:
+        choice = int(input("Input invalid, enter again: "))
+    if choice == 1:
+        login()
+    elif choice == 2:
+        signUp()
+    elif choice == 3:
+        exit()
+
+#main
+menu()
