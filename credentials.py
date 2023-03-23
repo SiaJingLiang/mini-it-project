@@ -13,7 +13,7 @@ conn.execute("INSERT INTO CREDENTIALS (ID,NAME,PHONE,EMAIL,OCCUPATION) \
     VALUES (1211106996, 'INSANE', '0123456789', 'MAIL@GMAIL.COM', 'STUDENT')");
 
 
-cursor = conn.execute("SELECT ID, phone, email, occupation from LIBRARY")
+cursor = conn.execute("SELECT ID, phone, email, occupation from CREDENTIALS")
 for row in cursor:
     print(row)
 
