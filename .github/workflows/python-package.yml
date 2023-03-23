@@ -4,7 +4,12 @@
 name: Python package
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - "mini-it-project"
+  pull_request:
+    branches:
+      - "mini-it-project"
 
 jobs:
   build:
