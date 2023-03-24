@@ -9,26 +9,37 @@ def signUp():
     name = str(input("Enter name: "))
     pwd = str(input("Enter password: "))
     phone = int(input("Enter phone: "))
-    email = str(input("Enter email: "))
-    occup = str(input("Enter occupation: "))
+    email = str(input("Enter email: "))    
+    occup = str(input("Enter occupation(student/ manager): "))
 
-    c.execute("INSERT INTO CREDENTIALS (ID, NAME, PASSWORD, PHONE, EMAIL, OCCUPATION) VALUES(?, ?, ?, ?, ?, ?)",(id, name, pwd, phone, email, occup))
-
+    try:
+        c.execute("INSERT INTO CREDENTIALS (ID, NAME, PASSWORD, PHONE, EMAIL, OCCUPATION) VALUES(?, ?, ?, ?, ?, ?)",(id, name, pwd, phone, email, occup))
+    except:
+        print("ID has been taken pls re-enter")
+        menu()
     #output = c.execute("SELECT * from CREDENTIALS")
     #for row in output:
     #    print(row)
-
+    print("Sign up successful")
     conn.commit()
-    conn.close()
+    c.close()
+    menu()
 
 def login():
-    id = str(input("Enter Username: "))
+    id = str(input("Enter ID: "))
     pwd = str(input("Enter password: "))
     output = c.execute("SELECT * from CREDENTIALS")
     for row in output:
-        print(row)
         if id == row[0] and pwd == row[2]:
-            print('true')
+            if row [5] == "student":
+                print("welcome", row[1])
+                studentFeature()
+            elif row [5] == "manager":
+                print("welcome", row[1])
+                managerFeature()
+        else:
+            print("password incorrect")
+            menu()
 
 def menu():
     choice=int(input("""[1]Login
@@ -44,5 +55,11 @@ Enter your choice: """))
     elif choice == 3:
         exit()
 
+def studentFeature():
+    print("studentFeature")
+
+def managerFeature():
+    print("managerFeature")
+
 #main
-menu()
+menu()   
