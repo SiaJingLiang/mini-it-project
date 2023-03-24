@@ -48,3 +48,4 @@ signUp()
 table = c.execute('SELECT * from CREDENTIALS')
 for x in table:
     print(x)
+    
