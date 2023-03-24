@@ -22,7 +22,6 @@ def signUp():
     #    print(row)
     print("Sign up successful")
     conn.commit()
-    c.close()
     menu()
 
 def login():
