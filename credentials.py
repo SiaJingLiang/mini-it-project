@@ -2,13 +2,15 @@ import sqlite3
 conn = sqlite3.connect('credentials.db')
 c = conn.cursor()
 
-def signUp():
-    c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS 
-                (NAME TEXT PRIMARY KEY NOT NULL, 
-                 PASSWORD TEXT NOT NULL, 
-                 PHONE INT NOT NULL, 
-                 EMAIL TEXT NOT NULL)''')
-    
+c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
+(NAME TEXT PRIMARY KEY NOT NULL, 
+ PASSWORD TEXT NOT NULL, 
+ PHONE INT NOT NULL, 
+ EMAIL TEXT NOT NULL)''')
+c.execute("INSERT INTO CREDENTIALS (NAME,PASSWORD,PHONE,EMAIL) \
+      VALUES ('ADMIN', 'Adminpwd', '0199999999', 'admin@email.com' )");
+
+def signUp():   
     name = str(input("Enter name: "))
     fetch  = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?', (name,))
     while name == '':
@@ -49,8 +51,8 @@ def checklogin(name,pwd):
 def studentFeature():
     print("studentFeature")
 
-def managerFeature():
-    print("managerFeature")
+def adminFeature():
+    print("adminFeature")
 
 def book_func():
     
@@ -109,9 +111,12 @@ def menu():
         quit()
 
     #all the feature after done the login
-    studentFeature()
-    print("After login feature")
-
+    for data in loginData:
+        user = data[0]
+    if user == 'ADMIN':
+        adminFeature()
+    else:
+        studentFeature()
 
 #main
 menu()
