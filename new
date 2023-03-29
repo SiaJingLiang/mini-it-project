@@ -1,92 +1,50 @@
-import sqlite3
-conn = sqlite3.connect('credentials.db')
-c = conn.cursor()
+def addBooks():
+    conn = sqlite3.connect('books.db')
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
+                    (ID INT NOT NULL, 
+                    TITLE TEXT PRIMARY NOT NULL,
+                    AUTHOR TEXT,
+                    CATEGORY TEXT NOT NULL, 
+                    AMOUNT INT NOT NULL,
+                    AMOUNTLEFT INT,
+                    PRICE REAL NOT NULL,
+                    DATEADDED TIMESTAMP NOT NULL, 
+                    BORROWEDBY TEXT,
+                    BORROWEDDATE TIMESTAMP)''')
+    title = input("Title: ")
+    fetch  = c.execute('SELECT TITLE from BOOKS WHERE TITLE=?', (title,))
+    if fetch.fetchnone != None:
+        choice = str(input("Book exists, do you want to increase amount only? y/n "))
+        if choice == "y":
+            find = c.execute('SELECT * from BOOKS WHERE TITLE=?', (title))
+            for row in find:
+                amount = row[3]
+                print("Amount is", amount)
+                return amount
+            newAmount = input("Enter amount to be added. ")
+            amount += newAmount
+            c.execute("UPDATE COMPANY set AMOUNT = ? WHERE TITLE = ?", (amount, title))
 
-def signUp():
-    c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS 
-                (NAME TEXT PRIMARY KEY NOT NULL, 
-                 PASSWORD TEXT NOT NULL, 
-                 PHONE INT NOT NULL, 
-                 EMAIL TEXT NOT NULL)''')
-    
-    name = str(input("Enter name: "))
-    fetch  = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?', (name,))
-    if fetch.fetchone() != None:
-        print("Username has been taken")
-        name = str(input("Enter name: "))
-
-    pwd = str(input("Enter password (at least 10 characters): "))
-    if len(pwd) < 10:
-        print("Too short enter again")
-        pwd = str(input("Enter password (at least 10 characters): "))
-
-    phone = input("Enter phone: ")
-    if len(phone) < 10 or len(phone) > 11 or phone.isdigit() == False:
-        print("Phone number invalid. ")
-        phone = int(input("Enter phone: "))
-
-    email = str(input("Enter email: "))
-    if '@' not in email:
-        print("Email invalid. ")
-        email = str(input("Enter email: "))
-
-    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL) VALUES(?, ?, ?, ?)",(name, pwd, phone, email))
-    print("Sign up successful")
-    conn.commit()
-    menu()
-
-def login(name,pwd):
-    name = str(input("Enter username: "))
-    pwd = str(input("Enter password: "))
-    check = c.execute('SELECT * from CREDENTIALS WHERE NAME=? AND PASSWORD=?', (name, pwd))
-    for row in check:
-        if row != None:
-            print("welcome")
-            return True
-        else:
-            print("password or username incorrect")
-            return False
-
-def checklogin(name,pwd):
-    check = c.execute('SELECT * from CREDENTIALS WHERE NAME=? AND PASSWORD=?', (name, pwd))
-    for row in check:
-        if row != None:
-            return True
-        else:
-            return False
-
-def studentFeature():
-    print("studentFeature")
-
-def managerFeature():
-    print("managerFeature")
-
-def menu():
-    login = False
-    choice=int(input("[1]Login \n[2]Sign Up \n[3]End \nEnter your choice: "))
-    if choice == 1:
-        name = str(input("Enter username: "))
-        pwd = str(input("Enter password: "))
-        login  = checklogin(name, pwd)
-        if login == True:
-            loginData = c.execute('SELECT * from CREDENTIALS WHERE NAME=? AND PASSWORD=?', (name, pwd))
-            print("login successful")
-        else:
-            print("username or password incorrect")
-            menu()
-            quit()
-    elif choice == 2:
-        signUp()
-    elif choice == 3:
-        quit()
-    else:
-        menu()
-        quit()
-
-    #all the feature after done the login
-    studentFeature()
-    print("After login feature")
-
-
-#main
-menu()
+    catChoice = input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\n[9]Back\nChoice: ")
+    if catChoice == 1:
+        category = str("literature")
+    elif catChoice == 2:
+        category = str("encyclopedia")
+    elif catChoice == 3:
+        category = str("guidlines")
+    elif catChoice == 4:
+        category = str("motivations")
+    elif catChoice == 5:
+        category = str("dictionary")
+    elif catChoice == 6:
+        category = str("history")
+    elif catChoice == 7:
+        category = str("news")
+    elif catChoice == 8:
+        category = str("others")
+    amount = int(input("Enter amount: "))
+    while amount == '' or amount <= 0 or amount.isdigit == False:
+        print("Invalid")
+        amount = int(input("Enter amount: "))
+    id = str(langChoice + catChoice + ficChoice)
