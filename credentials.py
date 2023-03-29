@@ -3,46 +3,47 @@ conn = sqlite3.connect('credentials.db')
 c = conn.cursor()
 
 def signUp():
-    c.execute('CREATE TABLE IF NOT EXISTS CREDENTIALS (NAME TEXT PRIMARY KEY NOT NULL, PASSWORD TEXT NOT NULL, PHONE INT NOT NULL, EMAIL TEXT NOT NULL)')
-    name = username()
-    pwd = password()
-    phone = telephone()
-    email = mail()
-    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL) VALUES(?, ?, ?, ?)",(name, pwd, phone, email,))
-    conn.commit()
-
-def username():
-    name = str(input("Enter Username: "))
-    fetch = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?', (name,))
-    if fetch.fetchone() != None:
-        print("Username taken. ")
-        username()
-    else:
-        return name
+    c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS 
+                (NAME TEXT PRIMARY KEY NOT NULL, 
+                 PASSWORD TEXT NOT NULL, 
+                 PHONE INT NOT NULL, 
+                 EMAIL TEXT NOT NULL)''')
+    name = str(input("Enter name: "))
+    fetch  = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?', (name,))
+    while name == '':
+        print("Username cannot be empty. ")
+        name = str(input("Enter name: "))
+    while fetch.fetchone() != None:
+        print("Username has been taken")
+        name = str(input("Enter name: "))
     
-def password():
     pwd = str(input("Enter password (at least 10 characters): "))
-    if len(pwd) < 10:
+    while pwd == '':
+        print("Password cannot be empty. ")
+        pwd = str(input("Enter password: "))
+    while len(pwd) < 10:
         print("Too short. ")
-        password()
-    else:
-        return pwd
+        pwd = str(input("Enter password (at least 10 characters): "))
 
-def telephone():
     phone = input("Enter phone: ")
-    if len(phone) < 10 or len(phone) > 11 or phone.isdigit() == False:
+    while phone == '':
+        print("Phone no. cannot be empty: ")
+    while len(phone) < 10 or len(phone) > 11 or phone.isdigit() == False:
         print("Phone number invalid. ")
-        telephone()
-    else:
-        return phone
+        phone = int(input("Enter phone: "))
 
-def mail():
     email = str(input("Enter email: "))
-    if '@' not in email:
+    while email == '':
+        print("Email cannot be empty. ")
+        email = str(input("Enter email: "))
+    while '@' not in email:
         print("Email invalid. ")
-        mail()
-    else:
-        return email
+        email = str(input("Enter email: "))
+
+    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL) VALUES(?, ?, ?, ?)",(name, pwd, phone, email))
+    print("Signed up successfully. ")
+    conn.commit()
+    print("Go to menu")
 
 signUp()
 table = c.execute('SELECT * from CREDENTIALS')
