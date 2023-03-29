@@ -1,4 +1,5 @@
 def addBooks():
+    categoryList =['literature', 'encyclopedia', 'guidlines', 'motivations', 'dictionary', 'history', 'news', 'others']
     conn = sqlite3.connect('books.db')
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
@@ -27,22 +28,15 @@ def addBooks():
             c.execute("UPDATE COMPANY set AMOUNT = ? WHERE TITLE = ?", (amount, title))
 
     catChoice = input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\n[9]Back\nChoice: ")
-    if catChoice == 1:
-        category = str("literature")
-    elif catChoice == 2:
-        category = str("encyclopedia")
-    elif catChoice == 3:
-        category = str("guidlines")
-    elif catChoice == 4:
-        category = str("motivations")
-    elif catChoice == 5:
-        category = str("dictionary")
-    elif catChoice == 6:
-        category = str("history")
-    elif catChoice == 7:
-        category = str("news")
-    elif catChoice == 8:
-        category = str("others")
+    while catChoice < 1 or catChoice >9:
+        print("Input invalid. ")
+        catChoice = input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\n[9]Back\nChoice: ")
+    if catChoice == 9:
+        menu()
+        quit()
+    else:
+        category = categoryList[catChoice-1]
+    
     amount = int(input("Enter amount: "))
     while amount == '' or amount <= 0 or amount.isdigit == False:
         print("Invalid")
