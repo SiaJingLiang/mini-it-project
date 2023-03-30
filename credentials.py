@@ -139,6 +139,18 @@ def minus_amount():
     print('Update successfully.')
     c.close()
       
-      
+def time_start():
+    time = c.execute("SELECT date('now')")
+    for x in time:
+        g = x[0]
+    return(g)
+
+def time_end():  
+    time = c.execute("SELECT date('now','+7 day')")
+    for x in time:
+        g = x[0]    
+    return(g)
+     
+     
 #main
 menu()
