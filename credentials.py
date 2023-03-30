@@ -7,8 +7,10 @@ c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
  PASSWORD TEXT NOT NULL, 
  PHONE INT NOT NULL, 
  EMAIL TEXT NOT NULL)''')
-c.execute("INSERT INTO CREDENTIALS (NAME,PASSWORD,PHONE,EMAIL) \
-      VALUES ('ADMIN', 'Adminpwd', '0199999999', 'admin@email.com' )");
+if fetch.fetchone != None:
+    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL)\
+        VALUES('ADMIN', 'ADMINPWD', 0199999999, 'admin@email.com') ");
+    conn.commit()
 
 def signUp():   
     name = str(input("Enter name: "))
