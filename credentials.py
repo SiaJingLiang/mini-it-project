@@ -120,5 +120,24 @@ def menu():
     else:
         studentFeature()
 
+#Update amount
+def update_amount(book_amount,book_id):
+    new_amount = """UPDATE BOOKS SET BOOK_AMOUNT = ? WHERE BOOK_ID = ?"""
+    data = (book_amount,book_id)
+    c.execute(new_amount,data)
+    conn.commit()
+    print('Update successfully.')
+    c.close()
+
+#Minus amount
+def minus_amount():
+    book_id = input('Enter book id: ')
+    minus_amount = int(input('Enter amount minus: ')) 
+    amount = c.execute('SELECT BOOK_AMOUNT from BOOKS WHERE BOOK_ID=?', (book_id,))
+    for x in amount:
+        final_amount = x[0] - minus_amount
+    total = final_amount
+    update_amount(total,book_id)      
+      
 #main
 menu()
