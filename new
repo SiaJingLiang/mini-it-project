@@ -38,7 +38,7 @@ def addBooks():
         category = categoryList[catChoice-1]
     
     amount = int(input("Enter amount: "))
-    while amount == '' or amount <= 0 or amount.isdigit == False:
+    while amount == '' or amount <= 0 or amount.isdigit() == False:
         print("Invalid")
         amount = int(input("Enter amount: "))
     id = str(langChoice + catChoice + ficChoice)
