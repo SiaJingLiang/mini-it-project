@@ -7,7 +7,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
  PASSWORD TEXT NOT NULL, 
  PHONE INT NOT NULL, 
  EMAIL TEXT NOT NULL)''')
-if fetch.fetchone != None:
+fetch = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?',('ADMIN',))
+if fetch.fetchone() == None:
     c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL)\
         VALUES('ADMIN', 'ADMINPWD', 0199999999, 'admin@email.com') ");
     conn.commit()
