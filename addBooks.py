@@ -7,157 +7,128 @@ c = conn.cursor()
     #author:done
     #category:done
     #amount:done
-    #amountleft:done
+    #amountleft:deleted
     #price:done
-    #dateadded:done
+    #dateadded:deleted
 
-def title():
-    title = input("Title: ")
-    fetch = c.execute('SELECT TITLE from BOOKS WHERE TITLE=?', (title,))
-    if fetch.fetchone() != None:
-        choice = str(input("Book exists, do you want to increase amount only? y/n "))
-        while choice not in ('y', 'n'):
-            print("Input invalid. ")
-            choice = str(input("Book exists, do you want to increase amount only? y/n ")) 
-        if choice == "y":
-            find = c.execute('SELECT * from BOOKS WHERE TITLE=?', (title))
-            for row in find:
-                amount = row[3]
-                print("Amount is", amount)
-                newAmount = input("Enter amount to be added: ")
-                confirmation = input("Enter again: ")
-                while newAmount != confirmation:
-                    print("Invalid")
-                    newAmount = input("Enter amount to be added: ")
-                    confirmation = input("Enter again: ")
-                amount += newAmount
-            c.execute("UPDATE BOOKS set AMOUNT = ? WHERE TITLE = ?", (amount, title))
-            conn.commit()
-            print("Amount is now " + amount)
-            quit()
-        elif choice == "n":
-            print("Menu")
-            quit()
-    else:
-        return title
+def titlef():
+    global title
+    title = str(input("Title: "))
+    while title == '':
+        print("Invalid")
+        title = str(input("Title: "))
 
-def category():
+def categoryf():
+    global category, catChoice, ficChoice, langChoice
     categoryList =['literature', 'encyclopedia', 'guidlines', 'motivations', 'dictionary', 'history', 'news', 'others']
     catChoice = int(input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\nEnter choice: "))
     while catChoice < 1 or catChoice >9:
         print("Input invalid. ")
         catChoice = int(input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\nEnter choice: "))
     category = categoryList[catChoice-1]
-    ficChoice = fiction()
-    langChoice = language()
-    return category, catChoice, ficChoice, langChoice
+    fictionf()
+    languagef()
 
-def amount():
+def amountf():
+    global amount
     amount = input("Enter amount: ")
     while amount == '' or int(amount) <= 0 or amount.isdigit() == False:
         print("Invalid")
-        amountleft = amount
-    return amount, amountleft
+        amount = input("Enter amount: ")
 
-def price():
+def pricef():
+    global price
     price = input("Enter price: RM")
     while price == '' or price.isdigit() == False:
         print("Invalid")
         price = input("Enter price: RM")
-    return price
 
-def author():
+def authorf():
+    global author
     author = str(input("Enter author: "))
-    return author
+    while author == '':
+        print("Invalid")
+        author = str(input("Enter author: "))
 
-def language():
-    langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
-    while langChoice == '' or langChoice.isdigit() == False or langChoice < 1 or langChoice > 5:
+def languagef():
+    global langChoice, language
+    languageList = ["English", "Malay", "Chinese", "Tamil", "Others"]
+    langChoice = int(input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: "))
+    while langChoice == '':
         print("Invalid")
         langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
-    return langChoice
+    language = str(languageList[langChoice-1])
+    
 
-def fiction():
+def fictionf():
+    global ficChoice, fiction
     ficChoice = input("[1]Fiction\n[2]Non-fiction\nEnter choice: ")
     while ficChoice not in ('1', '2'):
         print("Invalid")
         ficChoice = input("[1]Fiction\n[2]Non-fiction\nEnter choice: ")
-    ficChoice = int(ficChoice)
-    return ficChoice
-    
+    if ficChoice == 1:
+        fiction = str("Fiction")
+    else:
+        fiction = str("Non-fiction")
 
-def date():
-    today = c.execute("SELECT DATE ('now')")
-    for x in today:
-        date = x[0]
-    return date
-
-def confirmation(title, category, catChoice, ficChoice, langChoice, amount, amountleft, price, author, date, id):
-    c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
-                (ID INT NOT NULL,
-                TITLE TEXT PRIMARY KEY NOT NULL,
-                AUTHOR TEXT,
-                CATEGORY TEXT NOT NULL, 
-                AMOUNT INT NOT NULL,
-                AMOUNTLEFT INT NOT NULL,
-                PRICE REAL NOT NULL,
-                DATEADDED TEXT NOT NULL, 
-                BORROWEDBY TEXT,
-                BORROWEDDATE TEXT,
-                RETURNDATE TEXT);''')
-    title = title()
-    category, catChoice, ficChoice, langChoice = category()
-    amount, amountleft = amount()
-    price = price()
-    author = author()
-    confirmation = str(input("Do you want to make any changes? y/n "))
-    while confirmation not in ('y', 'n') or confirmation == '':
-        print("Invalid")
-        confirmation = str(input("Do you want to make any changes? y/n "))
-    if confirmation == 'y':
-        selection = input("[1]Title\n[2]Author\n[3]Category\n[4]Amount\n[5]Price\n[6]Cancel adding\nEnter choice: ")
-        while selection.isdigit() == False or int(selection) < 1 or int(selection) > 6:
-            selection = input("[1]Title\n[2]Author\n[3]Category\n[4]Amount\n[5]Price\n[6]Cancel adding\nEnter choice: ")
-        if selection == 1:
-            title = title()
-        elif selection == 2:
-            author = author()
-        elif selection == 3:
-            category, catChoice, ficChoice, langChoice = category()
-        elif selection == 4:
-            amount, amountleft = amount()
-        elif selection == 5:
-            price = price()
-        elif selection == 6:
-            print("Menu")
-            quit()
-    date = date()
-    id = id(catChoice, langChoice, ficChoice)
-    c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, AMOUNT, AMOUNTLEFT, PRICE, DATEADDED) VALUES(?, ?, ?, ?, ?, ?, ?, ?)", (id, title, author, category, amount, amountleft,price, date,))
+def commitf(id, title, author, category, language, fiction, amount, price, publisher,):
+    if int(amount) > 1:
+        for i in range (1, int(amount) + 1):
+            c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, title, author, category, language, fiction, amount, price, publisher,))
+            id = int(id) + 1
+    else:
+        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, title, author, category, language, fiction, amount, price, publisher,))
     conn.commit()
     
-def id(catChoice, langChoice, ficChoice):
+def idf(catChoice, langChoice, ficChoice):
     #id = category, language, fiction, index
+    global id
     catChoice = str(catChoice)
     langChoice = str(langChoice)
     ficChoice = str(ficChoice)
-    index = int(c.execute("SELECT COUNT(*) FROM BOOKS"))
-    if index == 0:
-        index = 1
-    index = str(index)
-    index = str(index.zfill(4))
-    id = (catChoice + langChoice + ficChoice + index)
-    return id
+    x = (catChoice + langChoice + ficChoice + "0001")
+    row = c.execute("SELECT * FROM BOOKS")
+    if row.fetchone() == None:
+        id = str(x)
+    elif len(row.fetchall()) >= 1:
+        h = (catChoice + langChoice + ficChoice + "0001")
+        h = int(h)
+        result = c.execute("SELECT ID FROM BOOKS")
+        for y in result:
+            if y[0] == h:
+                h += 1
+        id = (catChoice + langChoice + ficChoice + str(h.zfill(4)))
 
-def addBooks():
-    title = title()
-    category, catChoice, ficChoice, langChoice = category()
-    amount, amountleft = amount()
-    price = price()
-    author = author()
-    title, category, catChoice, ficChoice, langChoice, amount, amountleft, price, author, date, id = confirmation(title, category, catChoice, ficChoice, langChoice, amount, amountleft, price, author, date, id)
+def publisherf():
+    global publisher
+    publisher = str(input("Enter publisher: "))
+    while publisher == "":
+        print("Invalid")
+        publisher = str(input("Enter publisher: "))
+
+c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
+                (ID INT NOT NULL,
+                TITLE TEXT PRIMARY KEY NOT NULL,
+                AUTHOR TEXT,
+                CATEGORY TEXT NOT NULL,
+                LANGUAGE TEXT NOT NULL,
+                FICTION TEXT NOT NULL, 
+                AMOUNT INT NOT NULL,
+                PRICE REAL NOT NULL, 
+                PUBLISHER TEXT NOT NULL);''')
    
-addBooks()
+def addBooks():
+    titlef()
+    categoryf()
+    amountf()
+    pricef()
+    authorf()
+    idf(catChoice, langChoice, ficChoice)
+    publisherf()
+    print(title, category, fiction, language, amount, price, author, id, publisher)
+    commitf(id, title, author, category, language, fiction, amount, price, publisher)
+
+#addBooks()
 conn = sqlite3.connect('books.db')
 c = conn.cursor()
 c.execute('SELECT * FROM BOOKS')
