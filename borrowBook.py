@@ -1,13 +1,16 @@
 import sqlite3
 from datetime import datetime, timedelta
-conn = sqlite3.connect('books.db')
-con = sqlite3.connect('list.db')
+conn = sqlite3.connect('database.db')
 c = conn.cursor()
-d = con.cursor()
+conne = sqlite3.connect('books.db')
+b = conne.cursor()
+global userName
+userName = 'user1'
 
 def addBooks():
+#later replace with xiangze
     categoryList =['literature', 'encyclopedia', 'guidlines', 'motivations', 'dictionary', 'history', 'news', 'others']
-    c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
+    b.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
                     (ID           INT  PRIMARY KEY NOT NULL, 
                      TITLE        TEXT             NOT NULL,
                      AUTHOR       TEXT,
@@ -15,42 +18,62 @@ def addBooks():
                      AMOUNT       INT              NOT NULL,
                      AMOUNTLEFT   INT,
                      PRICE        REAL             NOT NULL)''')
-    fetch = c.execute('SELECT ID from BOOKS WHERE ID=?',(1,))
+    fetch = b.execute('SELECT ID from BOOKS WHERE ID=?',(1,))
     if fetch.fetchone() == None:
-        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, AMOUNT, AMOUNTLEFT, PRICE)\
+        b.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, AMOUNT, AMOUNTLEFT, PRICE)\
             VALUES('1', 'G101', 'LOGITECH', 'MOUSE', 100, 100, 100.5) ");
-        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, AMOUNT, AMOUNTLEFT, PRICE)\
+        b.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, AMOUNT, AMOUNTLEFT, PRICE)\
             VALUES('2', 'G102', 'LOGITECH', 'MOUSE', 100, 100, 100.5) ");
-        conn.commit()
-    
+        conne.commit()
+
+#show all books
 def showBook():
-    #show all books
-    cursor = c.execute("SELECT * from BOOKS")
+#later replace with shun hong
+    cursor = b.execute("SELECT * from BOOKS")
     for row in cursor:
         print (row)
-
-#borrow book and booking the book#
-#update time manualy
   
 def BorrowBook():
-    d.execute('''CREATE TABLE IF NOT EXISTS LIST
-                    (ID           INT       NOT NULL, 
-                     TITLE        TEXT      NOT NULL,
-                     BORROWEDBY   TEXT      NOT NULL,  
-                     BORROWEDDATE TIMESTAMP NOT NULL,
-                     EXPIREDDATE  TIMESTAMP NOT NULL,
-                     RETURNDATE   TIMESTAMP)''')
-
+    list = []
     qty = 0
     count = 0
     user = "user1"
     while qty <= 0 or qty >= 4:
         qty = int(input("input amount of book u want to borrow maximum 3: "))
     while count < qty:
+        bookMau = int(input("input book ID that u want to borrow: "))
+        list.append(bookMau)
+
+        now = datetime.datetime.now()
+        time = now.strftime("%d-%m-%Y %H:%M:%S")
+        c.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT-?, BORROWEDDATE=?, BORROWEDBY=? WHERE ID=?',(1,time,user,bookMau,));
+        c.execute("UPDATE BOOKS SET BORROWEDDATE=? || 'updated' WHERE ID=?",(time,bookMau))
+        conn.commit()
+        count += 1
+
+    cursor = conn.execute("SELECT * from BOOKS") 
+    for row in cursor:
+        print(row)
+
+def BorrowBook():
+    c.execute('''CREATE TABLE IF NOT EXISTS LIST
+                    (ID           INT       NOT NULL, 
+                     TITLE        TEXT      NOT NULL,
+                     BORROWEDBY   TEXT      NOT NULL,  
+                     BORROWEDDATE TIMESTAMP NOT NULL,
+                     EXPIREDDATE  TIMESTAMP NOT NULL, 
+                     COLLECT      INT       NOT NULL)''')
+    
+    qty = 0
+    count = 0
+    while qty <= 0 or qty >= 4:
+        qty = int(input("input amount of book u want to borrow maximum 3: "))
+
+    while count < qty:
         #select the book u want
         bookMau = int(input("input book ID that u want to borrow: "))
         #get book title
-        title = conn.execute('SELECT * from BOOKS WHERE ID=?', (bookMau,))
+        title = b.execute('SELECT * from BOOKS WHERE ID=?', (bookMau,))
         for bookName in title:
             title = bookName[1]
 
@@ -63,18 +86,13 @@ def BorrowBook():
         #expdate = datetime.strptime(expDate, "%Y-%m-%d")
 
         #update amount left into BOOKS.db & insert data into LIST.db
-        c.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT-? WHERE ID=?',(1,bookMau,))
-        d.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE) VALUES(?, ?, ?, ?, ?)', (bookMau, title, user, now, expDate,))
+        b.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT-? WHERE ID=?',(1,bookMau,))
+        c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, userName, now, expDate, 1))
 
+        conne.commit()
         conn.commit()
-        con.commit()
         count += 1
-
     print('borrow successful')
-    cursor = d.execute("SELECT * from LIST") 
-    for row in cursor:
-        print('The data of the book you borrowed.')
-        print(row)
 
 def ReturnBook(): 
     penalty = 0
@@ -82,20 +100,28 @@ def ReturnBook():
     for count in range (1, rtnAmt+1, 1):
         rtnBookID = int(input('Enter book ID that u want to return: '))
 
-        d.execute("SELECT BORROWEDDATE, EXPIREDDATE from LIST WHERE ID=?",(rtnBookID,))
-        BorrowDate, ExpriredDate = d.fetchone()
+        c.execute("SELECT EXPIREDDATE from LIST WHERE ID=?",(rtnBookID,))
+        ExpriredDate = c.fetchone()[0]
+    
+        now = datetime.now()
         #convert to object
-        Borrow_date = datetime.strptime(BorrowDate, "%Y-%m-%d")
         Exprired_date = datetime.strptime(ExpriredDate, "%Y-%m-%d")
-        #date diff
-        dateDiff = (Exprired_date - Borrow_date).days
-        print(dateDiff)
-        if dateDiff > 7:
-            penalty = penalty + ((dateDiff-7)*1)
-    print(penalty)
 
-addBooks()
-showBook()
-BorrowBook()
-ReturnBook()
+        #date diff
+        dateDiff = (now - Exprired_date).days
+        if dateDiff > 0:
+            penalty = penalty + (dateDiff*1)
+
+        #AMOUNTLEFT + 1
+        b.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT+? WHERE ID=?',(1,rtnBookID,))
+        conne.commit()
+
+        #delete data in LIST after the people return the book
+        c.execute('DELETE from LIST WHERE ID=?;',(rtnBookID,))
+        conn.commit()
+
+    #update credentials penalty database
+    c.execute('UPDATE CREDENTIALS SET PENALTY=PENALTY+? WHERE NAME=?',(penalty, userName))
+    conn.commit()
+    print(penalty)
 
