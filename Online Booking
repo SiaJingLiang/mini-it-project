@@ -1,4 +1,3 @@
-
 def CollectBook():
     # Read table where collect = 0
     d.execute("SELECT * from LIST WHERE COLLECT = ?",(0,))
@@ -27,5 +26,6 @@ def CollectBook():
         print('Update completed.')
         d.close()
 
+#Just ignore this
 def menu():
     int(input('Enter 1'))  
