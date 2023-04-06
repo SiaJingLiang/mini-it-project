@@ -1,15 +1,13 @@
-import sqlite3
-conn = sqlite3.connect('books.db')
-c = conn.cursor()
-
-    #id:done
-    #title:done
-    #author:done
-    #category:done
-    #amount:done
-    #amountleft:deleted
-    #price:done
-    #dateadded:deleted
+c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
+                (ID INT PRIMARY KEY NOT NULL,
+                TITLE TEXT NOT NULL,
+                AUTHOR TEXT,
+                CATEGORY TEXT NOT NULL,
+                LANGUAGE TEXT NOT NULL,
+                FICTION TEXT NOT NULL, 
+                AMOUNT INT NOT NULL,
+                PRICE REAL NOT NULL, 
+                PUBLISHER TEXT NOT NULL);''')
 
 def titlef():
     global title
@@ -20,7 +18,7 @@ def titlef():
 
 def categoryf():
     global category, catChoice, ficChoice, langChoice
-    categoryList =['literature', 'encyclopedia', 'guidlines', 'motivations', 'dictionary', 'history', 'news', 'others']
+    categoryList =['Literature', 'Encyclopedia', 'Guidlines', 'Motivations', 'Dictionary', 'History', 'News', 'Others']
     catChoice = int(input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\nEnter choice: "))
     while catChoice < 1 or catChoice >9:
         print("Input invalid. ")
@@ -58,7 +56,6 @@ def languagef():
         print("Invalid")
         langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
     language = str(languageList[langChoice-1])
-    
 
 def fictionf():
     global ficChoice, fiction
@@ -71,33 +68,34 @@ def fictionf():
     else:
         fiction = str("Non-fiction")
 
-def commitf(id, title, author, category, language, fiction, amount, price, publisher,):
+def commitf(index, title, author, category, language, fiction, amount, price, publisher,):
     if int(amount) > 1:
         for i in range (1, int(amount) + 1):
-            c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, title, author, category, language, fiction, amount, price, publisher,))
-            id = int(id) + 1
+            c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amount, price, publisher,))
+            index = int(index) + 1
     else:
-        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (id, title, author, category, language, fiction, amount, price, publisher,))
+        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amount, price, publisher,))
     conn.commit()
     
 def idf(catChoice, langChoice, ficChoice):
     #id = category, language, fiction, index
-    global id
+    global index
     catChoice = str(catChoice)
     langChoice = str(langChoice)
     ficChoice = str(ficChoice)
     x = (catChoice + langChoice + ficChoice + "0001")
     row = c.execute("SELECT * FROM BOOKS")
     if row.fetchone() == None:
-        id = str(x)
+        index = str(x)
     elif len(row.fetchall()) >= 1:
         h = (catChoice + langChoice + ficChoice + "0001")
         h = int(h)
-        result = c.execute("SELECT ID FROM BOOKS")
+        result = c.execute("SELECT * FROM BOOKS")
         for y in result:
             if y[0] == h:
                 h += 1
-        id = (catChoice + langChoice + ficChoice + str(h.zfill(4)))
+        h = str(h)
+        index = str(h.zfill(4))
 
 def publisherf():
     global publisher
@@ -105,17 +103,6 @@ def publisherf():
     while publisher == "":
         print("Invalid")
         publisher = str(input("Enter publisher: "))
-
-c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
-                (ID INT NOT NULL,
-                TITLE TEXT PRIMARY KEY NOT NULL,
-                AUTHOR TEXT,
-                CATEGORY TEXT NOT NULL,
-                LANGUAGE TEXT NOT NULL,
-                FICTION TEXT NOT NULL, 
-                AMOUNT INT NOT NULL,
-                PRICE REAL NOT NULL, 
-                PUBLISHER TEXT NOT NULL);''')
    
 def addBooks():
     titlef()
@@ -125,14 +112,6 @@ def addBooks():
     authorf()
     idf(catChoice, langChoice, ficChoice)
     publisherf()
-    print(title, category, fiction, language, amount, price, author, id, publisher)
-    commitf(id, title, author, category, language, fiction, amount, price, publisher)
-
-#addBooks()
-conn = sqlite3.connect('books.db')
-c = conn.cursor()
-c.execute('SELECT * FROM BOOKS')
-print(len(c.fetchall()))
-table = c.execute('SELECT * from BOOKS')
-for x in table:
-    print(x)
+    print(f"Title: {title} \nCategory: {category} \nFiction: {fiction} \nLanguage: {language} \nAmount: {amount} \nPrice: {price} \nAuthor: {author} \nIndex: {index} \nPublisher: {publisher}")
+    commitf(index, title, author, category, language, fiction, amount, price, publisher)
+    print("Back to menu to make any changes. ")
