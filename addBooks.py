@@ -40,6 +40,7 @@ def pricef():
     while price == '' or price.isdigit() == False:
         print("Invalid")
         price = input("Enter price: RM")
+    price = format(float(price), ".2f")
 
 def authorf():
     global author
