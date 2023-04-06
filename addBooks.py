@@ -7,7 +7,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS BOOKS
                 FICTION TEXT NOT NULL, 
                 AMOUNT INT NOT NULL,
                 PRICE REAL NOT NULL, 
-                PUBLISHER TEXT NOT NULL);''')
+                PUBLISHER TEXT NOT NULL,
+                YEAR INT);''')
 
 def titlef():
     global title
@@ -37,7 +38,7 @@ def amountf():
 def pricef():
     global price
     price = input("Enter price: RM")
-    while price == '' or price.isdigit() == False:
+    while price == '':
         print("Invalid")
         price = input("Enter price: RM")
     price = format(float(price), ".2f")
@@ -57,6 +58,7 @@ def languagef():
         print("Invalid")
         langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
     language = str(languageList[langChoice-1])
+    
 
 def fictionf():
     global ficChoice, fiction
@@ -69,14 +71,16 @@ def fictionf():
     else:
         fiction = str("Non-fiction")
 
-def commitf(index, title, author, category, language, fiction, amount, price, publisher,):
+def commitf(index, title, author, category, language, fiction, amount, price, publisher, year,):
+    amountl = int(1)
     if int(amount) > 1:
         for i in range (1, int(amount) + 1):
-            c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amount, price, publisher,))
+            c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER, YEAR) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amountl, price, publisher, year,))
             index = int(index) + 1
     else:
-        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amount, price, publisher,))
+        c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER, YEAR) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amountl, price, publisher, year,))
     conn.commit()
+    print("Book has been added. ")
     
 def idf(catChoice, langChoice, ficChoice):
     #id = category, language, fiction, index
@@ -86,9 +90,10 @@ def idf(catChoice, langChoice, ficChoice):
     ficChoice = str(ficChoice)
     x = (catChoice + langChoice + ficChoice + "0001")
     row = c.execute("SELECT * FROM BOOKS")
+    rows = c1.execute("SELECT * FROM BOOKS")
     if row.fetchone() == None:
         index = str(x)
-    elif len(row.fetchall()) >= 1:
+    elif len(rows.fetchall()) >= 1:
         h = (catChoice + langChoice + ficChoice + "0001")
         h = int(h)
         result = c.execute("SELECT * FROM BOOKS")
@@ -104,6 +109,14 @@ def publisherf():
     while publisher == "":
         print("Invalid")
         publisher = str(input("Enter publisher: "))
+
+def yearf():
+    global year
+    year = input("Enter year: ")
+    while year == '' or year.isdigit() == False:
+        print("Invalid")
+        year = input("Enter year: ")
+    year = int(year)
    
 def addBooks():
     titlef()
@@ -113,6 +126,7 @@ def addBooks():
     authorf()
     idf(catChoice, langChoice, ficChoice)
     publisherf()
-    print(f"Title: {title} \nCategory: {category} \nFiction: {fiction} \nLanguage: {language} \nAmount: {amount} \nPrice: {price} \nAuthor: {author} \nIndex: {index} \nPublisher: {publisher}")
-    commitf(index, title, author, category, language, fiction, amount, price, publisher)
+    yearf()
+    print(f"\nTitle: {title} \nCategory: {category} \nFiction: {fiction} \nLanguage: {language} \nAmount: {amount} \nPrice: {price} \nAuthor: {author} \nIndex: {index} \nPublisher: {publisher}")
+    commitf(index, title, author, category, language, fiction, amount, price, publisher, year)
     print("Back to menu to make any changes. ")
