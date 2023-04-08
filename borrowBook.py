@@ -6,7 +6,7 @@ conne = sqlite3.connect('books.db')
 b = conne.cursor()
 global userName
 userName = 'user1'
-
+#update
 def addBooks():
 #later replace with xiangze
     categoryList =['literature', 'encyclopedia', 'guidlines', 'motivations', 'dictionary', 'history', 'news', 'others']
