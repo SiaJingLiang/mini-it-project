@@ -1,7 +1,7 @@
 import sqlite3
 conn = sqlite3.connect('credentials.db')
+# hello
 c = conn.cursor()
-
 c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
 (NAME TEXT PRIMARY KEY NOT NULL, 
  PASSWORD TEXT NOT NULL, 
