@@ -44,14 +44,16 @@ def search_menu():
         listing(data)
 
     while True:
-        choice = input("Another search? (y/n) ")
-        if choice.lower() == 'y':
+        choice = input("[1]Another search \n[2]Borrow Book \n[3]Back to menu")
+        if choice == 1:
             search_menu()
-        elif choice.lower() == 'n':
+        elif choice == 2:
+            BorrowBook(0)
+        elif choice == '3':
             print("***we will proceed back to menu***")
             menu()
         else:
-            print("Invalid input. Please enter 'y' or 'n'.")
+            print("Invalid input.")
 
 def view_all_books():
     c.execute("SELECT * FROM books")
@@ -67,14 +69,16 @@ def view_all_books():
         listing(data)
     
     while True:
-        choice = input("Another search? (y/n) ")
-        if choice.lower() == 'y':
+        choice = input("[1]Another search \n[2]Borrow Book \n[3]Back to menu")
+        if choice == 1:
             search_menu()
-        elif choice.lower() == 'n':
+        elif choice == 2:
+            BorrowBook(0)
+        elif choice == '3':
             print("***we will proceed back to menu***")
             menu()
         else:
-            print("Invalid input. Please enter 'y' or 'n'.")
+            print("Invalid input.")
 
 def listing(data):
     headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION","AVAILABILITY", "PUBLISHER", "YEAR"]
