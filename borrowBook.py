@@ -6,7 +6,7 @@ conne = sqlite3.connect('books.db')
 b = conne.cursor()
 global userName
 userName = 'user1'
-#update
+
 def addBooks():
 #later replace with xiangze
     categoryList =['literature', 'encyclopedia', 'guidlines', 'motivations', 'dictionary', 'history', 'news', 'others']
@@ -32,30 +32,8 @@ def showBook():
     cursor = b.execute("SELECT * from BOOKS")
     for row in cursor:
         print (row)
-  
-def BorrowBook():
-    list = []
-    qty = 0
-    count = 0
-    user = "user1"
-    while qty <= 0 or qty >= 4:
-        qty = int(input("input amount of book u want to borrow maximum 3: "))
-    while count < qty:
-        bookMau = int(input("input book ID that u want to borrow: "))
-        list.append(bookMau)
 
-        now = datetime.datetime.now()
-        time = now.strftime("%d-%m-%Y %H:%M:%S")
-        c.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT-?, BORROWEDDATE=?, BORROWEDBY=? WHERE ID=?',(1,time,user,bookMau,));
-        c.execute("UPDATE BOOKS SET BORROWEDDATE=? || 'updated' WHERE ID=?",(time,bookMau))
-        conn.commit()
-        count += 1
-
-    cursor = conn.execute("SELECT * from BOOKS") 
-    for row in cursor:
-        print(row)
-
-def BorrowBook():
+def BorrowBook(x):
     c.execute('''CREATE TABLE IF NOT EXISTS LIST
                     (ID           INT       NOT NULL, 
                      TITLE        TEXT      NOT NULL,
@@ -87,12 +65,40 @@ def BorrowBook():
 
         #update amount left into BOOKS.db & insert data into LIST.db
         b.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT-? WHERE ID=?',(1,bookMau,))
-        c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, userName, now, expDate, 1))
+        c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, userName, now, expDate, x))
 
         conne.commit()
         conn.commit()
         count += 1
     print('borrow successful')
+
+def CollectBook():
+    # Read table where collect = 0
+    c.execute("SELECT * from LIST WHERE COLLECT = ?",(0,))
+    record = c.fetchall()
+    for row in record:
+        print('ID: ',row[0])
+        print('Title: ',row[1])
+        print('Borrowed by: ',row[2])
+        print('Borrowed date: ',row[3])
+        print('Return date: ',row[4])
+        print('Collect: ',row[5])
+        print('-----------')
+
+    user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
+    while user_input not in [1,2]:
+        print('Invalid input, please try again.')
+        user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
+    if user_input == 2:
+        #Back to admin menu (X)
+        menu()
+    elif user_input == 1:
+        # Change collect into 1
+        book_id = input('Enter book ID: ')
+        c.execute('UPDATE LIST SET COLLECT = ? WHERE ID = ?',(1,book_id,))
+        conn.commit()
+        print('Update completed.')
+        c.close()
 
 def ReturnBook(): 
     penalty = 0
@@ -124,4 +130,3 @@ def ReturnBook():
     c.execute('UPDATE CREDENTIALS SET PENALTY=PENALTY+? WHERE NAME=?',(penalty, userName))
     conn.commit()
     print(penalty)
-
