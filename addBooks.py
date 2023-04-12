@@ -21,7 +21,7 @@ def categoryf():
     global category, catChoice, ficChoice, langChoice
     categoryList =['Literature', 'Encyclopedia', 'Guidlines', 'Motivations', 'Dictionary', 'History', 'News', 'Others']
     catChoice = int(input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\nEnter choice: "))
-    while catChoice < 1 or catChoice >9:
+    while catChoice < 1 or catChoice > 9:
         print("Input invalid. ")
         catChoice = int(input("[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\nEnter choice: "))
     category = categoryList[catChoice-1]
