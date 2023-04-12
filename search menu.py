@@ -25,7 +25,10 @@ def search_menu():
         menu()
     else:
         choice = choices[choice_input-1]
-    user_input = str(input(f"Enter {choice}: "))
+        if choice_input == 6:
+            user_input = str(input(f"Enter {choice} (0 or 1): "))
+        else:
+            user_input = str(input(f"Enter {choice}: "))
     library = str(f"SELECT ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PUBLISHER, YEAR FROM books WHERE {choice} LIKE '%{user_input}%'")
     print(library)
     data = []
