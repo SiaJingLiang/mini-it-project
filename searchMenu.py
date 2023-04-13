@@ -3,11 +3,12 @@ import sqlite3
 conn = sqlite3.connect('books.db')
 c = conn.cursor()
 
-def menu():
+#def menu():
+def searchBook():
     choice = int(input("[1]Search Book \n[2]View All Books \n[3]Back to menu \nEnter your choice: "))
     while choice == '' or choice < 1 or choice > 3: 
-        print("Invalid")
-        choice = input("[1]Search Book \n[2]View All Books \nEnter your choice: ")
+        print("Input Invalid")
+        choice = int(input("[1]Search Book \n[2]View All Books \n[3]Back to menu \nEnter your choice: "))
     if choice == 1:
         search_menu()
     elif choice == 2:
