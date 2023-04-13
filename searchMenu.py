@@ -4,7 +4,7 @@ conn = sqlite3.connect('books.db')
 c = conn.cursor()
 
 #def menu():
-def searchBook():
+def menu():
     choice = int(input("[1]Search Book \n[2]View All Books \n[3]Back to menu \nEnter your choice: "))
     while choice == '' or choice < 1 or choice > 3: 
         print("Input Invalid")
@@ -31,7 +31,6 @@ def search_menu():
         else:
             user_input = str(input(f"Enter {choice}: "))
     library = str(f"SELECT ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PUBLISHER, YEAR FROM books WHERE {choice} LIKE '%{user_input}%'")
-    print(library)
     data = []
     c.execute(library)
     books = c.fetchall()
@@ -45,16 +44,17 @@ def search_menu():
         listing(data)
 
     while True:
-        choice = input("[1]Another search \n[2]Borrow Book \n[3]Back to menu")
-        if choice == 1:
+        choice = input("[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: ")
+        if choice == '1':
             search_menu()
-        elif choice == 2:
+        elif choice == '2':
             BorrowBook(0)
         elif choice == '3':
             print("***we will proceed back to menu***")
             menu()
         else:
             print("Invalid input.")
+
 
 def view_all_books():
     c.execute("SELECT * FROM books")
@@ -70,16 +70,17 @@ def view_all_books():
         listing(data)
     
     while True:
-        choice = input("[1]Another search \n[2]Borrow Book \n[3]Back to menu")
-        if choice == 1:
+        choice = input("[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: ")
+        if choice == '1':
             search_menu()
-        elif choice == 2:
+        elif choice == '2':
             BorrowBook(0)
         elif choice == '3':
             print("***we will proceed back to menu***")
             menu()
         else:
             print("Invalid input.")
+
 
 def listing(data):
     headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION","AVAILABILITY", "PUBLISHER", "YEAR"]
