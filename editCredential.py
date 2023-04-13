@@ -37,7 +37,7 @@ def edit_credential():
             print("Email invalid. ")
             value = str(input("Enter email: "))
 
-    #need get name from global
+    print("need get name from global")
     c.execute(f"UPDATE CREDENTIALS set {choice} = {value} WHERE NAME={name}")
     print("Signed up successfully. ")
     conn.commit()
