@@ -76,11 +76,14 @@ def commitf(index, title, author, category, language, fiction, amount, price, pu
     if int(amount) > 1:
         for i in range (1, int(amount) + 1):
             c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER, YEAR) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amountl, price, publisher, year,))
-            index = int(index) + 1
+            conn.commit()
+            index = int(index) + 1   
     else:
         c.execute("INSERT INTO BOOKS (ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PRICE, PUBLISHER, YEAR) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", (index, title, author, category, language, fiction, amountl, price, publisher, year,))
-    conn.commit()
+        conn.commit()
     print("Book has been added. ")
+    c.close()
+    conn.close()
     
 def idf(catChoice, langChoice, ficChoice):
     #id = category, language, fiction, index
