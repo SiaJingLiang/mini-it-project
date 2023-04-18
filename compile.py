@@ -45,6 +45,7 @@ def signUp():
     while name == '' or fetch.fetchone() != None:
         print("Username has been taken")
         name = str(input("Enter name: "))
+        fetch  = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?', (name,))
     
     pwd = str(input("Enter password (at least 10 characters): "))
     while pwd == '' or len(pwd) < 10:
@@ -302,10 +303,21 @@ def BorrowBook(x):
         while count < qty:
             #select the book u want
             bookMau = int(input("input book ID that u want to borrow: "))
+            c.execute('SELECT TITLE FROM BOOKS where ID=?',(bookMau,))
+            id = c.fetchone()
+            c.execute('SELECT * FROM BOOKS WHERE ID=?',(bookMau,))
+            qty = int(c.fetchone()[6])
+            while id== None or qty<=0:
+                print("Book is not available. Please enter a valid book ID")
+                bookMau = int(input("input book ID that u want to borrow: "))
+                c.execute('SELECT TITLE FROM BOOKS where ID=?',(bookMau,))
+                id = c.fetchone()
+                c.execute('SELECT * FROM BOOKS WHERE ID=?',(bookMau,))
+                qty = int(c.fetchone()[6])
+            
             #get book title
-            title = c.execute('SELECT * from BOOKS WHERE ID=?', (bookMau,))
-            for bookName in title:
-                title = bookName[1]
+            c.execute('SELECT * from BOOKS WHERE ID=?', (bookMau,))
+            title = c.fetchone()[1]
 
             #create borrow datetime
             now = datetime.now().strftime("%Y-%m-%d")
