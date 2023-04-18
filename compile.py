@@ -285,8 +285,24 @@ def listing(data):
     print(tabulate(data, headers=headers, tablefmt="outline"))
 
 def BorrowBook(x):
-    c.execute('SELECT PENALTY from CREDENTIALS WHERE NAME=?',(user,))
-    penalty = c.fetchone()[0]
+    if x == 1:
+        username = input("enter username:")
+        c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
+        result = c.fetchone()
+        #print(username)
+        while result == None:
+            print("Username not found in database.")
+            username = input("enter username:")
+            c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
+            result = c.fetchone()
+
+        c.execute('SELECT PENALTY from CREDENTIALS WHERE NAME=?',(result[0],))
+        penalty = c.fetchone()[0]
+
+    elif x == 0:
+        c.execute('SELECT PENALTY from CREDENTIALS WHERE NAME=?',(user,))
+        penalty = c.fetchone()[0]
+
     if penalty != None :
         print("currrently your status is not available, pay your penalty first to borrow books \n the amount you need to pay is: $", penalty)
         #payment system
@@ -297,40 +313,63 @@ def BorrowBook(x):
     else:
         qty = 0
         count = 0
+        amt = 0
+        data = []
         while qty <= 0 or qty >= 4:
             qty = int(input("input amount of book u want to borrow maximum 3: "))
 
         while count < qty:
             #select the book u want
-            bookMau = int(input("input book ID that u want to borrow: "))
-            c.execute('SELECT TITLE FROM BOOKS where ID=?',(bookMau,))
+            bookMau = input("input book ID that u want to borrow: ")
+            #while not bookMau.isdigit():
+            #    bookMau = input("input book ID that u want to borrow: ")
+            c.execute('SELECT ID FROM BOOKS where ID=?',(bookMau,))
             id = c.fetchone()
-            c.execute('SELECT * FROM BOOKS WHERE ID=?',(bookMau,))
-            qty = int(c.fetchone()[6])
-            while id== None or qty<=0:
-                print("Book is not available. Please enter a valid book ID")
-                bookMau = int(input("input book ID that u want to borrow: "))
-                c.execute('SELECT TITLE FROM BOOKS where ID=?',(bookMau,))
-                id = c.fetchone()
-                c.execute('SELECT * FROM BOOKS WHERE ID=?',(bookMau,))
-                qty = int(c.fetchone()[6])
-            
+            num = c.execute('SELECT AMOUNT FROM BOOKS WHERE ID=?',(bookMau,))
+            for row in num:
+                amt = int(row[0])
+            while id==None or amt<=0:
+                print("Book is not available. Please enter a valid book ID ")
+                bookMau = input("input book ID that u want to borrow or press 'n' back to menu: ")
+                if bookMau == 'n':
+                    if user == "ADMIN":
+                        adminFeature()
+                    else:
+                        studentFeature()
+                else:
+                    bookMau = int(bookMau)
+                    c.execute('SELECT TITLE FROM BOOKS where ID=?',(bookMau,))
+                    id = c.fetchone()
+                    num = c.execute('SELECT AMOUNT FROM BOOKS WHERE ID=?',(bookMau,))
+                    for row in num:
+                        amt = int(row[0])
+
             #get book title
-            c.execute('SELECT * from BOOKS WHERE ID=?', (bookMau,))
-            title = c.fetchone()[1]
+            book = c.execute('SELECT * from BOOKS WHERE ID=?', (bookMau,))
+            for row in book:
+                title = row[1]
+                data.append(row)
+            listing(data)
 
-            #create borrow datetime
-            now = datetime.now().strftime("%Y-%m-%d")
+            decn=input("press any key to continue, press 'n' back to menu: ")
+            if decn=='n' :
+                if user == "ADMIN":
+                    adminFeature()
+                else:
+                    studentFeature()
+            else:
+                #create borrow datetime
+                now = datetime.now().strftime("%Y-%m-%d")
             
-            #create expried datetime
-            expDate = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
+                #create expried datetime
+                expDate = (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d")
 
-            #update amount left into BOOKS.db & insert data into LIST.db
-            c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT-? WHERE ID=?',(1,bookMau,))
-            c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, user, now, expDate, x,))
+                #update amount left into BOOKS.db & insert data into LIST.db
+                c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT-? WHERE ID=?',(1,bookMau,))
+                c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, user, now, expDate, x,))
 
-            conn.commit()
-            count += 1
+                conn.commit()
+                count += 1
         print('borrow successful')
         if user == "ADMIN":
             adminFeature()
