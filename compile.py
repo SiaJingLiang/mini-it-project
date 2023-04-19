@@ -156,10 +156,12 @@ def idf(catChoice, langChoice, ficChoice):
     ficChoice = str(ficChoice)
     x = (catChoice + langChoice + ficChoice + "0001")
     row = c.execute("SELECT * FROM BOOKS")
+    existance = row.fetchone()
     rows = c.execute("SELECT * FROM BOOKS")
-    if row.fetchone() == None:
+    quantity = len(rows.fetchall())
+    if existance == None:
         index = str(x)
-    elif len(rows.fetchall()) >= 1:
+    elif quantity >= 1:
         h = (catChoice + langChoice + ficChoice + "0001")
         h = int(h)
         result = c.execute("SELECT * FROM BOOKS")
@@ -281,7 +283,7 @@ def view_all_books():
                 studentFeature()
 
 def listing(data):
-    headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION","AMOUNT", "AVAILABILITY", "PUBLISHER", "YEAR"]
+    headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AMOUNT", "AVAILABILITY", "PUBLISHER", "YEAR"]
     print(tabulate(data, headers=headers, tablefmt="outline"))
 
 def BorrowBook(x):
@@ -523,15 +525,17 @@ def studentFeature():
         quit()
 
 def adminFeature():
-    print("[1]Add book \n[2]Borrow Books \n[3]View Books To collect \n[4]Return Books \n[5]Log Out")
+    print("[1]Add book \n[2]Search book \n[3]Borrow Books \n[4]View Books To collect \n[5]Return Books \n[6]Log Out")
     choice = int(input("Enter your choice: "))
     if choice == 1:
         addBooks()
     elif choice == 2:
-        BorrowBook(1)
+        search_menu()
     elif choice == 3:
-        CollectBook()
+        BorrowBook(1)
     elif choice == 4:
+        CollectBook()
+    elif choice == 5:
         ReturnBook()
     else:
         main()

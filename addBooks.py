@@ -1,3 +1,8 @@
+import sqlite3
+from tabulate import tabulate
+conn = sqlite3.connect('database.db')
+c = conn.cursor()
+
 c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
                 (ID INT PRIMARY KEY NOT NULL,
                 TITLE TEXT NOT NULL,
@@ -92,11 +97,16 @@ def idf(catChoice, langChoice, ficChoice):
     langChoice = str(langChoice)
     ficChoice = str(ficChoice)
     x = (catChoice + langChoice + ficChoice + "0001")
+    print(x)
     row = c.execute("SELECT * FROM BOOKS")
-    rows = c1.execute("SELECT * FROM BOOKS")
+    print(row.fetchone())
+    rows = c.execute("SELECT * FROM BOOKS")
+    print(rows.fetchall())
     if row.fetchone() == None:
+        print("Yes")
         index = str(x)
     elif len(rows.fetchall()) >= 1:
+        print("Yessir")
         h = (catChoice + langChoice + ficChoice + "0001")
         h = int(h)
         result = c.execute("SELECT * FROM BOOKS")
@@ -133,3 +143,5 @@ def addBooks():
     print(f"\nTitle: {title} \nCategory: {category} \nFiction: {fiction} \nLanguage: {language} \nAmount: {amount} \nPrice: {price} \nAuthor: {author} \nIndex: {index} \nPublisher: {publisher}")
     commitf(index, title, author, category, language, fiction, amount, price, publisher, year)
     print("Back to menu to make any changes. ")
+
+addBooks()
