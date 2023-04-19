@@ -26,7 +26,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS BOOKS
                 AMOUNT INT NOT NULL,
                 PRICE REAL NOT NULL, 
                 PUBLISHER TEXT NOT NULL,
-                YEAR INT);''')
+                YEAR INT );''')
 
 c.execute('''CREATE TABLE IF NOT EXISTS LIST
          (ID           INT       NOT NULL, 
@@ -220,7 +220,7 @@ def search_menu():
         choice_input = int(input("Search with: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Availability \n[7]Publisher \n[8]Back to menu \nEnter your choice: "))
     if choice_input == 8:
         if user == "ADMIN":
-                adminFeature()
+            adminFeature()
         else:
             studentFeature()
     else:
@@ -230,11 +230,11 @@ def search_menu():
         else:
             user_input = str(input(f"Enter {choice}: "))
     library = str(f"SELECT ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PUBLISHER, YEAR FROM books WHERE {choice} LIKE '%{user_input}%'")
-    print(library)
+    #print(library)
     data = []
     c.execute(library)
     books = c.fetchall()
-    print(books)
+    #print(books)
     if len(books) == 0:
         print("No books found.")
     else:
@@ -244,26 +244,34 @@ def search_menu():
         listing(data)
 
     while True:
-        choice = int(input("[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: "))
-        while choice < 1 or choice >4:
-            choice = input("Invalid input. \n[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: ")
-        if choice == 1:
-            search_menu()
-        elif choice == 2:
-            BorrowBook(0)
-        elif choice == 3:
-            print("***we will proceed back to menu***")
-            if user == "ADMIN":
-                adminFeature()
-            else:
+        if user != "ADMIN":
+            choice = int(input("[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: "))
+            while choice < 1 or choice >4:
+                choice = input("Invalid input. \n[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: ")
+            if choice == 1:
+                search_menu()
+            elif choice == 2:
+                BorrowBook(0)
+            elif choice == 3:
+                print("we will proceed back to menu")
                 studentFeature()
+
+        elif user == "ADMIN":
+            choice = int(input("[1]Another search \n[2]Back to menu \nEnter your choice: "))
+            while choice < 1 or choice >3:
+                choice = input("Invalid input. \n[1]Another search \n[2]Back to menu \nEnter your choice: ")
+            if choice == 1:
+                search_menu()
+            elif choice == 2:
+                print("we will proceed back to menu")
+                adminFeature()
 
 def view_all_books():
     c.execute("SELECT * FROM books")
     books = c.fetchall()
     data = []
     if len(books) == 0:
-        print("No books found.")
+       print("No books found.")
     else:
         print("Books:")
         for book in books:
@@ -271,19 +279,27 @@ def view_all_books():
         listing(data)
     
     while True:
-        choice = int(input("[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: "))
-        while choice < 1 or choice >4:
-            choice = input("Invalid input. \n[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: ")
-        if choice == 1:
-            search_menu()
-        elif choice == 2:
-            BorrowBook(0)
-        elif choice == 3:
-            print("***we will proceed back to menu***")
-            if user == "ADMIN":
-                adminFeature()
-            else:
+        if user != "ADMIN":
+            choice = int(input("[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: "))
+            while choice < 1 or choice >4:
+                choice = input("Invalid input. \n[1]Another search \n[2]Borrow Book \n[3]Back to menu \nEnter your choice: ")
+            if choice == 1:
+                search_menu()
+            elif choice == 2:
+                BorrowBook(0)
+            elif choice == 3:
+                print("we will proceed back to menu")
                 studentFeature()
+
+        elif user == "ADMIN":
+            choice = int(input("[1]Another search \n[2]Back to menu \nEnter your choice: "))
+            while choice < 1 or choice >3:
+                choice = input("Invalid input. \n[1]Another search \n[2]Back to menu \nEnter your choice: ")
+            if choice == 1:
+                search_menu()
+            elif choice == 2:
+                print("we will proceed back to menu")
+                adminFeature()
 
 def listing(data):
     headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AVAILABILITY", "PRICE", "PUBLISHER", "YEAR"]
@@ -326,8 +342,6 @@ def BorrowBook(x):
         while count < qty:
             #select the book u want
             bookMau = input("Input book ID that u want to borrow: ")
-            #while not bookMau.isdigit():
-            #    bookMau = input("input book ID that u want to borrow: ")
             c.execute('SELECT ID FROM BOOKS where ID=?',(bookMau,))
             id = c.fetchone()
             num = c.execute('SELECT AMOUNT FROM BOOKS WHERE ID=?',(bookMau,))
@@ -383,6 +397,7 @@ def BorrowBook(x):
 
 def CollectBook():
     # Read table where collect = 0
+    list = []
     c.execute("SELECT * from LIST WHERE COLLECT = ?",(0,))
     record = c.fetchall()
     for row in record:
@@ -407,13 +422,26 @@ def CollectBook():
         c.execute('UPDATE LIST SET COLLECT = ? WHERE ID = ?',(1,book_id,))
         conn.commit()
         print('Update completed.')
-        c.close()
 
 def ReturnBook(): 
     penalty = 0
+    count = 0
+    data = c.execute('SELECT * FROM LIST')
+    for x in data:
+        count = count + 1
     rtnAmt = int(input('Enter how many books u want to return: '))
+    while rtnAmt > count:
+        print("the amount u input is not valid")
+        rtnAmt = int(input('Enter how many books u want to return: '))
     for count in range (1, rtnAmt+1, 1):
         rtnBookID = int(input('Enter book ID that u want to return: '))
+        c.execute('SELECT ID FROM LIST WHERE ID=?',(rtnBookID,))
+        id = c.fetchone()
+        while id == None:
+            print("input invalid, input again")
+            rtnBookID = int(input('Enter book ID that u want to return: '))
+            c.execute('SELECT ID FROM LIST WHERE ID=?',(rtnBookID,))
+            id = c.fetchone()
 
         c.execute("SELECT EXPIREDDATE from LIST WHERE ID=?",(rtnBookID,))
         ExpriredDate = c.fetchone()[0]
@@ -421,21 +449,26 @@ def ReturnBook():
         now = datetime.now()
         #convert to object
         Exprired_date = datetime.strptime(ExpriredDate, "%Y-%m-%d")
-
+        print("now ",now)
+        print("ExpriredDate ",ExpriredDate)
         #date diff
         dateDiff = (now - Exprired_date).days
+        print("dateDiff ",dateDiff)
         if dateDiff > 0:
             penalty = penalty + (dateDiff*1)
 
-        #AMOUNTLEFT + 1
-        c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT+? WHERE ID=?',(1,rtnBookID,))
-        conn.commit()
+        #AMOUNT + 1
+        #c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT+? WHERE ID=?',(1,rtnBookID,))
+        #conn.commit()
 
         #delete data in LIST after the people return the book
-        c.execute('DELETE from LIST WHERE ID=?;',(rtnBookID,))
-        conn.commit()
+        #c.execute('DELETE from LIST WHERE ID=?;',(rtnBookID,))
+        #conn.commit()
 
+        print("return successful")
+        print("penalty ",penalty)
     #update credentials penalty database
+    print(user)
     c.execute('UPDATE CREDENTIALS SET PENALTY=PENALTY+? WHERE NAME=?',(penalty, user))
     conn.commit()
 
@@ -533,7 +566,7 @@ def adminFeature():
     if choice == 1:
         addBooks()
     elif choice == 2:
-        search_menu()
+        searchBook()
     elif choice == 3:
         BorrowBook(1)
     elif choice == 4:
