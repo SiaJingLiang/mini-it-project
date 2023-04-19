@@ -219,7 +219,10 @@ def search_menu():
     while choice_input < 1 or choice_input > 8:
         choice_input = int(input("Search with: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Availability \n[7]Publisher \n[8]Back to menu \nEnter your choice: "))
     if choice_input == 8:
-        studentFeature()
+        if user == "ADMIN":
+                adminFeature()
+        else:
+            studentFeature()
     else:
         choice = choices[choice_input-1]
         if choice_input == 6:
