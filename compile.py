@@ -13,7 +13,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
 fetch = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?',('ADMIN',))
 if fetch.fetchone() == None:
     c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL)\
-        VALUES('ADMIN', 'ADMINPWD', 0199999999, 'admin@email.com') ");
+        VALUES('ADMIN', 'ADMINPWD', 0199999999, 'admin@email.com') ")
     conn.commit()
 
 c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
@@ -286,13 +286,13 @@ def listing(data):
 
 def BorrowBook(x):
     if x == 1:
-        username = input("enter username:")
+        username = input("Enter username:")
         c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
         result = c.fetchone()
         #print(username)
         while result == None:
             print("Username not found in database.")
-            username = input("enter username:")
+            username = input("Enter username:")
             c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
             result = c.fetchone()
 
@@ -304,7 +304,7 @@ def BorrowBook(x):
         penalty = c.fetchone()[0]
 
     if penalty != None :
-        print("currrently your status is not available, pay your penalty first to borrow books \n the amount you need to pay is: $", penalty)
+        print(f"Currrently your status is not available, pay your penalty first to borrow books. \nThe amount you need to pay is: RM{penalty}")
         #payment system
         if user == "ADMIN":
             adminFeature()
@@ -316,11 +316,11 @@ def BorrowBook(x):
         amt = 0
         data = []
         while qty <= 0 or qty >= 4:
-            qty = int(input("input amount of book u want to borrow maximum 3: "))
+            qty = int(input("Input amount of book u want to borrow maximum 3: "))
 
         while count < qty:
             #select the book u want
-            bookMau = input("input book ID that u want to borrow: ")
+            bookMau = input("Input book ID that u want to borrow: ")
             #while not bookMau.isdigit():
             #    bookMau = input("input book ID that u want to borrow: ")
             c.execute('SELECT ID FROM BOOKS where ID=?',(bookMau,))
@@ -330,7 +330,7 @@ def BorrowBook(x):
                 amt = int(row[0])
             while id==None or amt<=0:
                 print("Book is not available. Please enter a valid book ID ")
-                bookMau = input("input book ID that u want to borrow or press 'n' back to menu: ")
+                bookMau = input("Input book ID that u want to borrow or press 'n' back to menu: ")
                 if bookMau == 'n':
                     if user == "ADMIN":
                         adminFeature()
@@ -423,7 +423,7 @@ def ReturnBook():
             penalty = penalty + (dateDiff*1)
 
         #AMOUNTLEFT + 1
-        c.execute('UPDATE BOOKS SET AMOUNTLEFT=AMOUNTLEFT+? WHERE ID=?',(1,rtnBookID,))
+        c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT+? WHERE ID=?',(1,rtnBookID,))
         conn.commit()
 
         #delete data in LIST after the people return the book
@@ -503,7 +503,7 @@ def main():
         studentFeature()
 
 def studentFeature():
-    print("[1]Search Book \n[2]view status \n[3]Edit user Details \n[4]Log Out")
+    print("[1]Search Book \n[2]View status \n[3]Edit user Details \n[4]Log Out")
     choice = int(input("Enter your choice:"))
     if choice == 1:
         searchBook()
@@ -523,7 +523,7 @@ def studentFeature():
         quit()
 
 def adminFeature():
-    print("[1]add book \n[2]Borrow Books \n[3]View Books To collect \n[4]Return Books \n[5]Log Out")
+    print("[1]Add book \n[2]Borrow Books \n[3]View Books To collect \n[4]Return Books \n[5]Log Out")
     choice = int(input("Enter your choice: "))
     if choice == 1:
         addBooks()
@@ -536,7 +536,7 @@ def adminFeature():
     else:
         main()
         quit()
-    print("adminFeature")
+    adminFeature()
 
 #main
 main()
