@@ -49,7 +49,7 @@ def search_menu():
         if choice == '1':
             search_menu()
         elif choice == '2':
-            BorrowBook(0)
+            borrowBook(0)
         elif choice == '3':
             print("***we will proceed back to menu***")
             menu()
@@ -75,7 +75,7 @@ def view_all_books():
         if choice == '1':
             search_menu()
         elif choice == '2':
-            BorrowBook(0)
+            borrowBook(0)
         elif choice == '3':
             print("***we will proceed back to menu***")
             menu()
