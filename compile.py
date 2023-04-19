@@ -286,7 +286,7 @@ def view_all_books():
                 studentFeature()
 
 def listing(data):
-    headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AMOUNT", "AVAILABILITY", "PUBLISHER", "YEAR"]
+    headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AVAILABILITY", "PRICE", "PUBLISHER", "YEAR"]
     print(tabulate(data, headers=headers, tablefmt="outline"))
 
 def BorrowBook(x):
