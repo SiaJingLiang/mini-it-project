@@ -12,8 +12,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
              PENALTY  INT )''')
 fetch = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?',('ADMIN',))
 if fetch.fetchone() == None:
-    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL)\
-        VALUES('ADMIN', 'ADMINPWD', 0199999999, 'admin@email.com') ")
+    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL, PENALTY)\
+        VALUES('ADMIN', 'ADMINPWD', 0199999999, 'admin@email.com', 0) ")
     conn.commit()
 
 c.execute('''CREATE TABLE IF NOT EXISTS BOOKS 
@@ -62,7 +62,7 @@ def signUp():
         print("Email invalid. ")
         email = str(input("Enter email: "))
 
-    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL) VALUES(?, ?, ?, ?)",(name, pwd, phone, email))
+    c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL, PENALTY) VALUES(?, ?, ?, ?, ?)",(name, pwd, phone, email, 0))
     print("Signed up successfully. ")
     conn.commit()
     main()
@@ -324,7 +324,7 @@ def BorrowBook(x):
         c.execute('SELECT PENALTY from CREDENTIALS WHERE NAME=?',(user,))
         penalty = c.fetchone()[0]
 
-    if penalty != None :
+    if penalty != 0 :
         print(f"Currrently your status is not available, pay your penalty first to borrow books. \nThe amount you need to pay is: RM{penalty}")
         #payment system
         if user == "ADMIN":
@@ -385,8 +385,12 @@ def BorrowBook(x):
 
                 #update amount left into BOOKS.db & insert data into LIST.db
                 c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT-? WHERE ID=?',(1,bookMau,))
-                c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, user, now, expDate, x,))
 
+                if x==0:
+                    c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, user, now, expDate, x,))
+                elif x==1:
+                    c.execute('INSERT INTO LIST (ID, TITLE, BORROWEDBY, BORROWEDDATE, EXPIREDDATE, COLLECT) VALUES(?, ?, ?, ?, ?, ?)', (bookMau, title, username, now, expDate, x,))
+                    
                 conn.commit()
                 count += 1
         print('borrow successful')
@@ -400,6 +404,7 @@ def CollectBook():
     list = []
     c.execute("SELECT * from LIST WHERE COLLECT = ?",(0,))
     record = c.fetchall()
+    #USE tabulate
     for row in record:
         print('ID: ',row[0])
         print('Title: ',row[1])
@@ -443,33 +448,33 @@ def ReturnBook():
             c.execute('SELECT ID FROM LIST WHERE ID=?',(rtnBookID,))
             id = c.fetchone()
 
+        c.execute('SELECT BORROWEDBY FROM LIST WHERE ID=?',(rtnBookID,))
+        brwer = c.fetchone()[0]
+        print(brwer)
+
         c.execute("SELECT EXPIREDDATE from LIST WHERE ID=?",(rtnBookID,))
         ExpriredDate = c.fetchone()[0]
     
         now = datetime.now()
         #convert to object
         Exprired_date = datetime.strptime(ExpriredDate, "%Y-%m-%d")
-        print("now ",now)
-        print("ExpriredDate ",ExpriredDate)
+
         #date diff
         dateDiff = (now - Exprired_date).days
-        print("dateDiff ",dateDiff)
         if dateDiff > 0:
             penalty = penalty + (dateDiff*1)
 
         #AMOUNT + 1
-        #c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT+? WHERE ID=?',(1,rtnBookID,))
-        #conn.commit()
+        c.execute('UPDATE BOOKS SET AMOUNT=AMOUNT+? WHERE ID=?',(1,rtnBookID,))
+        conn.commit()
 
         #delete data in LIST after the people return the book
-        #c.execute('DELETE from LIST WHERE ID=?;',(rtnBookID,))
-        #conn.commit()
+        c.execute('DELETE from LIST WHERE ID=?;',(rtnBookID,))
+        conn.commit()
 
         print("return successful")
-        print("penalty ",penalty)
     #update credentials penalty database
-    print(user)
-    c.execute('UPDATE CREDENTIALS SET PENALTY=PENALTY+? WHERE NAME=?',(penalty, user))
+    c.execute('UPDATE CREDENTIALS SET PENALTY=PENALTY+? WHERE NAME=?',(penalty, brwer))
     conn.commit()
 
 def edit_credential(): 
