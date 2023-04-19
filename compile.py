@@ -214,7 +214,7 @@ def searchBook():
         studentFeature()
 
 def search_menu():
-    choices = ["title", "author", "year", "category", "language", "availability", "publisher"]
+    choices = ["title", "author", "year", "category", "language", "amount", "publisher"]
     choice_input = int(input("Search with: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Availability \n[7]Publisher \n[8]Back to menu \nEnter your choice: "))
     while choice_input < 1 or choice_input > 8:
         choice_input = int(input("Search with: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Availability \n[7]Publisher \n[8]Back to menu \nEnter your choice: "))
