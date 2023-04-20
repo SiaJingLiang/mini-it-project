@@ -168,7 +168,7 @@ def idf(catChoice, langChoice, ficChoice):
             if y[0] == x:
                 x += 1
         x = str(x)
-        index = str(x.zfill(4))
+        index = x
 
 def publisherf():
     global publisher
