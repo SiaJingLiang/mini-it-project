@@ -413,19 +413,32 @@ def CollectBook():
         print('Collect: ',row[5])
         print('-----------')
 
-    user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
-    while user_input not in [1,2]:
-        print('Invalid input, please try again.')
-        user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
-    if user_input == 2:
-        #Back to admin menu (X)
+    book = c.execute("SELECT ID from LIST WHERE COLLECT = ?",(0,))
+    books = book.fetchall()
+    if books == []:
+        print('No books to be collected')
         adminFeature()
-    elif user_input == 1:
-        # Change collect into 1
-        book_id = input('Enter book ID: ')
+
+    else:
+        user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
+        while user_input not in [1,2]:
+            print('Invalid input, please try again.')
+            user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
+        if user_input == 2:
+            #Back to admin menu (X)
+            adminFeature()
+        elif user_input == 1:
+            # Change collect into 1
+            book_id = int(input('Enter book ID: '))
+            book = c.execute("SELECT ID from LIST WHERE COLLECT = ?",(0,))
+            books = book.fetchall()
+            while (book_id,) not in books:
+                print("Invalid")
+                book_id = int(input('Enter book ID: '))
         c.execute('UPDATE LIST SET COLLECT = ? WHERE ID = ?',(1,book_id,))
         conn.commit()
         print('Update completed.')
+
 
 def ReturnBook(): 
     penalty = 0
