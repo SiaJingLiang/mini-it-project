@@ -1,4 +1,5 @@
 import sqlite3
+import time
 from datetime import datetime, timedelta
 from tabulate import tabulate
 conn = sqlite3.connect('database.db')
@@ -9,7 +10,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS CREDENTIALS
              PASSWORD TEXT NOT NULL, 
              PHONE    INT  NOT NULL, 
              EMAIL    TEXT NOT NULL,
-             PENALTY  INT )''')
+             PENALTY  REAL )''')
 fetch = c.execute('SELECT NAME from CREDENTIALS WHERE NAME=?',('ADMIN',))
 if fetch.fetchone() == None:
     c.execute("INSERT INTO CREDENTIALS (NAME, PASSWORD, PHONE, EMAIL, PENALTY)\
@@ -120,7 +121,7 @@ def languagef():
     global langChoice, language
     languageList = ["English", "Malay", "Chinese", "Tamil", "Others"]
     langChoice = int(input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: "))
-    while langChoice == '' or langChoice < 1 or langChoice > 5:
+    while langChoice == '':
         print("Invalid")
         langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
     language = str(languageList[langChoice-1])
@@ -162,13 +163,14 @@ def idf(catChoice, langChoice, ficChoice):
     if existance == None:
         index = str(x)
     elif quantity >= 1:
-        x = int(x)
+        h = (catChoice + langChoice + ficChoice + "0001")
+        h = int(h)
         result = c.execute("SELECT * FROM BOOKS")
         for y in result:
-            if y[0] == x:
-                x += 1
-        x = str(x)
-        index = x
+            if y[0] == h:
+                h += 1
+        h = str(h)
+        index = str(h.zfill(4))
 
 def publisherf():
     global publisher
@@ -304,6 +306,147 @@ def listing(data):
     headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AVAILABILITY", "PRICE", "PUBLISHER", "YEAR"]
     print(tabulate(data, headers=headers, tablefmt="outline"))
 
+def check_expiry(expiry):
+    if str(expiry[0]) == 0:
+        month = str(expiry[1])
+    else:
+        month = str(expiry[0]+expiry[1])
+    year = str(expiry.split("/")[1])
+    named_tuple = time.localtime() # get struct_time
+    time_string = time.strftime("%m/%Y", named_tuple)
+    month1 = str(time_string.split("/")[0])
+    year1 = str(time_string.split("/")[1])
+    if int(year) < int(year1):
+        print("Credit card is expired. ")
+        return False
+    elif int(year) == int(year1):
+        if int(month) < int(month1):
+            print("Credit card is expired. ")
+            return False
+        else:
+            return True
+    elif int(year) > int(year1):
+        return True
+
+def Card(penalty,user,username):
+    card_number = int(input("Enter card number (without dash): "))
+    while len(str(card_number)) != 12:
+        card_number = int(input("Invalid number, please enter again (without dash): "))
+    expiry = str(input("Enter expiry date (MM/YYYY): "))
+    expDate = check_expiry(expiry)
+    if expDate == False:
+        choose = input("Do you want to continue? y/n: ")
+        while choose not in ["n", "y"]:
+            choose = str(input("continue? y/n: "))
+        if choose == "y":
+            Card(penalty)
+        if choose == "n":
+            if user == "ADMIN":
+                adminFeature()
+            else:
+                studentFeature()
+    elif expDate == True:
+        cvv = str(input("Enter CVV: "))
+        while len(cvv) != 3:
+            cvv = int(input("Invalid CVV, please enter again: "))
+        pin = int(input("Enter pin: "))
+        choose = str(input("Confim payment? y/n: "))
+        while choose not in ["n", "y"]:
+            choose = str(input("continue? y/n: "))
+        if choose == "n":
+            if user == "ADMIN":
+                adminFeature()
+            else:
+                studentFeature()
+        elif choose == "y":
+            print("Connecting...")
+            time.sleep(3.0)
+            print("Authenticating...")
+            time.sleep(2.0)
+            print("Payment success. ")  
+        
+            c.execute('UPDATE CREDENTIALS SET PENALTY=0 WHERE NAME=?',(username,))
+            conn.commit()
+        if user == "ADMIN":
+            adminFeature()
+        else:
+            studentFeature()
+
+import webbrowser
+def eWallet(penalty, user, username):
+    print(f"Amount u need to pay is {penalty}")
+    tbc = str(input("Confim payment? y/n: "))
+    while tbc not in ["n", "y"]:
+        tbc = str(input("continue? y/n: "))
+    if tbc == "n":
+        if user == "ADMIN":
+            adminFeature()
+        else:
+            studentFeature()
+    elif tbc == "y":
+        url = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.m.wikipedia.org%2Fwiki%2FFile%3ATotally_not_a_Rickroll_QR_code.png&psig=AOvVaw0vhkuaQBY9qyqhmJnNaE4L&ust=1682066763179000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCIjV7pCJuP4CFQAAAAAdAAAAABAJ"
+        webbrowser.open(url)
+        print('Payment success')
+
+        c.execute('UPDATE CREDENTIALS SET PENALTY=0 WHERE NAME=?',(username,))
+        conn.commit()
+    if user == "ADMIN":
+        adminFeature()
+    else:
+        studentFeature()
+
+def Cash(penalty, user, username):
+    print(f"Amount u need to pay is {penalty}")
+    tbc = str(input("Confim payment? y/n: "))
+    while tbc not in ["n", "y"]:
+        tbc = str(input("continue? y/n: "))
+    if tbc == "n":
+        if user == "ADMIN":
+            adminFeature()
+        else:
+            studentFeature()
+    elif tbc == "y":
+        balance = 0
+        while balance < penalty:
+            print(f"Need {penalty - balance} more")
+            payment = float(input("Enter paid amount: $"))
+            balance += payment
+        print(f"Payment success. Your change is ${balance - penalty:.2f}")
+
+        c.execute('UPDATE CREDENTIALS SET PENALTY=0 WHERE NAME=?',(username,))
+        conn.commit()
+    if user == "ADMIN":
+        adminFeature()
+    else:
+        studentFeature()
+
+def selcpaymtd(penalty, user, username):
+    process = int(input("[1]pay your penalty \n[2]Exit \nEnter your choice: "))
+    while process not in [1, 2]:
+        process = int(input("input invalid, enter again \n[1]pay your penalty \n[2]Exit \nEnter your choice: "))
+    if process == 1:
+        print("select your payment method")
+        if user == "ADMIN":
+            select = int(input("[1]Card \n[2]Ewallet \n[3]Cash \nEnter your choice: "))
+            while select not in [1,2,3]:
+                select = int(input("input invalid, enter again \n[1]Card \n[2]Ewallet \n[3]Cash \nEnter your choice: "))
+        else:
+            select = int(input("[1]Card \n[2]Ewallet \nEnter your choice: "))
+            while select not in [1,2]:
+                select = int(input("input invalid, enter again \n[1]Card \n[2]Ewallet \nEnter your choice: "))
+        if select == 1:
+            Card(penalty, user, username)
+        elif select == 2:
+            eWallet(penalty, user, username)
+        elif select == 3:
+            Cash(penalty,user,username)
+            
+    elif process == 2:
+        if user == "ADMIN":
+            adminFeature()
+        else:
+            studentFeature()
+
 def BorrowBook(x):
     if x == 1:
         username = input("Enter username:")
@@ -325,11 +468,7 @@ def BorrowBook(x):
 
     if penalty != 0 :
         print(f"Currrently your status is not available, pay your penalty first to borrow books. \nThe amount you need to pay is: RM{penalty}")
-        #payment system
-        if user == "ADMIN":
-            adminFeature()
-        else:
-            studentFeature()
+        selcpaymtd(penalty, user, username)
     else:
         qty = 0
         count = 0
@@ -369,7 +508,7 @@ def BorrowBook(x):
                 data.append(row)
             listing(data)
 
-            decn=input("press any key to continue, press 'n' back to menu: ")
+            decn=input("comfirm? press any key to continue, press 'n' back to menu: ")
             if decn=='n' :
                 if user == "ADMIN":
                     adminFeature()
@@ -438,6 +577,13 @@ def CollectBook():
         c.execute('UPDATE LIST SET COLLECT = ? WHERE ID = ?',(1,book_id,))
         conn.commit()
         print('Update completed.')
+    cnt = str(input("continue? y/n: "))
+    while cnt not in ['y', 'n']:
+        cnt = str(input("Input invalid, input again \ncontinue? y/n: "))
+    if cnt == 'y':
+        CollectBook()
+    elif cnt == 'n':
+        adminFeature()
 
 
 def ReturnBook(): 
@@ -462,7 +608,6 @@ def ReturnBook():
 
         c.execute('SELECT BORROWEDBY FROM LIST WHERE ID=?',(rtnBookID,))
         brwer = c.fetchone()[0]
-        print(brwer)
 
         c.execute("SELECT EXPIREDDATE from LIST WHERE ID=?",(rtnBookID,))
         ExpriredDate = c.fetchone()[0]
@@ -569,8 +714,12 @@ def studentFeature():
             print('Phone: ',row[2])
             print('Email: ',row[3])
             print('Penalty: ',row[4])
+            penalty = row[4]
             print('-----------')
-        studentFeature()
+            if penalty != 0:
+                selcpaymtd(penalty,user, user)
+            else:
+                studentFeature()
     elif choice == 3:
         edit_credential()
     else:
