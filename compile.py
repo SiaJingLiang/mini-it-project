@@ -120,7 +120,7 @@ def languagef():
     global langChoice, language
     languageList = ["English", "Malay", "Chinese", "Tamil", "Others"]
     langChoice = int(input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: "))
-    while langChoice == '':
+    while langChoice == '' or langChoice < 1 or langChoice > 5:
         print("Invalid")
         langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
     language = str(languageList[langChoice-1])
