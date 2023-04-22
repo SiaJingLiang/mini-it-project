@@ -163,14 +163,11 @@ def idf(catChoice, langChoice, ficChoice):
     if existance == None:
         index = str(x)
     elif quantity >= 1:
-        h = (catChoice + langChoice + ficChoice + "0001")
-        h = int(h)
         result = c.execute("SELECT * FROM BOOKS")
-        for y in result:
-            if y[0] == h:
-                h += 1
-        h = str(h)
-        index = str(h.zfill(4))
+        for x in result:
+            if y[0] == x:
+                x += 1
+        index = x
 
 def publisherf():
     global publisher
