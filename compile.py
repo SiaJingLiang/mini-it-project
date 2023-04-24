@@ -165,7 +165,7 @@ def idf(catChoice, langChoice, ficChoice):
         index = int(x)
     elif quantity >= 1:
         result = c.execute("SELECT * FROM BOOKS")
-        for x in result:
+        for y in result:
             if y[0] == x:
                 x += 1
         index = x
