@@ -535,6 +535,10 @@ def BorrowBook(x):
         else:
             studentFeature()
 
+def ReturnListing(list):
+    headers = ["ID","Title","Borrowed by","Borrowed date","Return date","Collect"]
+    print(tabulate(list, headers = headers, tablefmt = "outline"))
+
 def CollectBook():
     # Read table where collect = 0
     list = []
@@ -542,13 +546,8 @@ def CollectBook():
     record = c.fetchall()
     #USE tabulate
     for row in record:
-        print('ID: ',row[0])
-        print('Title: ',row[1])
-        print('Borrowed by: ',row[2])
-        print('Borrowed date: ',row[3])
-        print('Return date: ',row[4])
-        print('Collect: ',row[5])
-        print('-----------')
+        list.append(row)
+    ReturnListing(list)
 
     book = c.execute("SELECT ID from LIST WHERE COLLECT = ?",(0,))
     books = book.fetchall()
@@ -582,7 +581,6 @@ def CollectBook():
         CollectBook()
     elif cnt == 'n':
         adminFeature()
-
 
 def ReturnBook(): 
     penalty = 0
