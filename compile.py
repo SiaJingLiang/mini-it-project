@@ -683,7 +683,7 @@ def edit_book():
     print(tabulate(data, headers=headers, tablefmt="outline"))
     choice_input = int(input("\nEdit: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Fiction \n[7]Amount \n[8]Publisher \n[9]Back to menu \nEnter your choice: "))
     while choice_input < 1 or choice_input > 8:
-        choice_input = int(input("\nEdit: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Fiction \n[7]Amount \n[8]Publisher \n[9]Year \n[10]Back to menu \nEnter your choice: "))
+        choice_input = int(input("\nEdit: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Fiction \n[7]Amount \n[8]Publisher \n[9]Back to menu \nEnter your choice: "))
     if choice_input == 1:
         title = str(input("Edit title: "))
         c.execute(f"UPDATE BOOKS SET TITLE = '{title}' WHERE ID = {id}")
