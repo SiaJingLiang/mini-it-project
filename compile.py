@@ -337,7 +337,7 @@ def Card(penalty,user,username):
         while choose not in ["n", "y"]:
             choose = str(input("continue? y/n: "))
         if choose == "y":
-            Card(penalty)
+            Card(penalty,user,username)
         if choose == "n":
             if user == "ADMIN":
                 adminFeature()
