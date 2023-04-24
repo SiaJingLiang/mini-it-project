@@ -375,7 +375,7 @@ def eWallet(penalty, user, username):
     print(f"Amount u need to pay is {penalty}")
     tbc = str(input("Confim payment? y/n: "))
     while tbc not in ["n", "y"]:
-        tbc = str(input("continue? y/n: "))
+        tbc = str(input("Continue? y/n: "))
     if tbc == "n":
         if user == "ADMIN":
             adminFeature()
@@ -397,7 +397,7 @@ def Cash(penalty, user, username):
     print(f"Amount u need to pay is {penalty}")
     tbc = str(input("Confim payment? y/n: "))
     while tbc not in ["n", "y"]:
-        tbc = str(input("continue? y/n: "))
+        tbc = str(input("Continue? y/n: "))
     if tbc == "n":
         if user == "ADMIN":
             adminFeature()
@@ -419,19 +419,19 @@ def Cash(penalty, user, username):
         studentFeature()
 
 def selcpaymtd(penalty, user, username):
-    process = int(input("[1]pay your penalty \n[2]Exit \nEnter your choice: "))
+    process = int(input("[1]Pay your penalty \n[2]Exit \nEnter your choice: "))
     while process not in [1, 2]:
-        process = int(input("input invalid, enter again \n[1]pay your penalty \n[2]Exit \nEnter your choice: "))
+        process = int(input("Input invalid, enter again \n[1]Pay your penalty \n[2]Exit \nEnter your choice: "))
     if process == 1:
-        print("select your payment method")
+        print("Select your payment method")
         if user == "ADMIN":
             select = int(input("[1]Card \n[2]Ewallet \n[3]Cash \nEnter your choice: "))
             while select not in [1,2,3]:
-                select = int(input("input invalid, enter again \n[1]Card \n[2]Ewallet \n[3]Cash \nEnter your choice: "))
+                select = int(input("Input invalid, enter again \n[1]Card \n[2]Ewallet \n[3]Cash \nEnter your choice: "))
         else:
             select = int(input("[1]Card \n[2]Ewallet \nEnter your choice: "))
             while select not in [1,2]:
-                select = int(input("input invalid, enter again \n[1]Card \n[2]Ewallet \nEnter your choice: "))
+                select = int(input("Input invalid, enter again \n[1]Card \n[2]Ewallet \nEnter your choice: "))
         if select == 1:
             Card(penalty, user, username)
         elif select == 2:
