@@ -160,8 +160,9 @@ def idf(catChoice, langChoice, ficChoice):
     existance = row.fetchone()
     rows = c.execute("SELECT * FROM BOOKS")
     quantity = len(rows.fetchall())
+    x = int(x)
     if existance == None:
-        index = str(x)
+        index = int(x)
     elif quantity >= 1:
         result = c.execute("SELECT * FROM BOOKS")
         for x in result:
