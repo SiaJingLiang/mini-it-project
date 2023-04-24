@@ -632,6 +632,9 @@ def ReturnBook():
 
 def edit_credential(): 
     choices = int(input("Edit: \n[1]Name \n[2]Password \n[3]Phone \n[4]Email \nEnter choice: "))
+    while choices not in [1,2,3,4]:
+        print('Invalid input.')
+        choices = int(input("Edit: \n[1]Name \n[2]Password \n[3]Phone \n[4]Email \nEnter choice: "))
     if choices == 1:
         choice = "NAME"  
         value = str(input("Enter name: "))
