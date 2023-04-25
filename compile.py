@@ -697,7 +697,7 @@ def edit_book():
         publisher = int(input("Edit publisher: "))
         c.execute(f"UPDATE BOOKS SET YEAR = {publisher} WHERE ID = {id}")
     elif choice_input == 9:
-        menu()
+        adminFeature()
     elif choice_input == 4:
         find_title = c.execute(f"SELECT TITLE FROM BOOKS WHERE ID = {id}")
         for x in find_title:
