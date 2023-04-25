@@ -852,7 +852,7 @@ def studentFeature():
         quit()
 
 def adminFeature():
-    print("[1]Add book \n[2]Search book \n[3]Borrow Books \n[4]View Books To collect \n[5]Return Books \n[6]Log Out")
+    print("[1]Add book \n[2]Search book \n[3]Borrow Books \n[4]View Books To collect \n[5]Return Books \n[6]Edit books \n[7]Log out")
     choice = int(input("Enter your choice: "))
     if choice == 1:
         addBooks()
@@ -864,6 +864,8 @@ def adminFeature():
         CollectBook()
     elif choice == 5:
         ReturnBook()
+    elif choice == 6:
+        edit_book()                
     else:
         main()
         quit()
