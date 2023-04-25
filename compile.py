@@ -168,7 +168,6 @@ def idf(catChoice, langChoice, ficChoice):
             if y[0] == x:
                 x += 1
         index = x
-    print(index)
 
 def publisherf():
     global publisher
@@ -227,9 +226,8 @@ def search_menu():
             user_input = str(input(f"Enter {choice} (0 or 1): "))
         else:
             user_input = str(input(f"Enter {choice}: "))
-    #print(library)
     data = []
-    c.execute(f"SELECT ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PUBLISHER, YEAR FROM books WHERE {choice} LIKE ?", ("%" + user_input + "%",))
+    c.execute(f"SELECT * FROM books WHERE {choice} LIKE ?", ("%" + user_input + "%",))
     books = c.fetchall()
     if len(books) == 0:
         print("No books found.")
@@ -299,6 +297,7 @@ def view_all_books():
 
 def listing(data):
     headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AVAILABILITY", "PRICE", "PUBLISHER", "YEAR"]
+    data.sort()
     print(tabulate(data, headers=headers, tablefmt="outline"))
 
 def check_expiry(expiry):
@@ -447,7 +446,6 @@ def BorrowBook(x):
         username = input("Enter username:")
         c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
         result = c.fetchone()
-        #print(username)
         while result == None:
             print("Username not found in database.")
             username = input("Enter username:")
@@ -526,7 +524,7 @@ def BorrowBook(x):
                     
                 conn.commit()
                 count += 1
-        print('borrow successful')
+        print('Borrowed successfully')
         if user == "ADMIN":
             adminFeature()
         else:
@@ -585,17 +583,21 @@ def ReturnBook():
     data = c.execute('SELECT * FROM LIST')
     for x in data:
         count = count + 1
-    rtnAmt = int(input('Enter how many books u want to return: '))
+    rtnAmt = int(input('Enter number of books to return: '))
+    if rtnAmt == 0:
+        adminFeature()
     while rtnAmt > count:
-        print("the amount u input is not valid")
-        rtnAmt = int(input('Enter how many books u want to return: '))
+        print("Invalid amount")
+        rtnAmt = int(input('Enter number of books to return: '))
+        if rtnAmt == 0:
+            adminFeature()
     for count in range (1, rtnAmt+1, 1):
-        rtnBookID = int(input('Enter book ID that u want to return: '))
+        rtnBookID = int(input('Enter book ID: '))
         c.execute('SELECT ID FROM LIST WHERE ID=?',(rtnBookID,))
         id = c.fetchone()
         while id == None:
-            print("input invalid, input again")
-            rtnBookID = int(input('Enter book ID that u want to return: '))
+            print("Input invalid, input again")
+            rtnBookID = int(input('Enter book ID: '))
             c.execute('SELECT ID FROM LIST WHERE ID=?',(rtnBookID,))
             id = c.fetchone()
 
@@ -621,13 +623,13 @@ def ReturnBook():
         #delete data in LIST after the people return the book
         c.execute('DELETE from LIST WHERE ID=?;',(rtnBookID,))
         conn.commit()
-
         print("return successful")
     #update credentials penalty database
     c.execute('UPDATE CREDENTIALS SET PENALTY=PENALTY+? WHERE NAME=?',(penalty, brwer))
     conn.commit()
 
 def edit_credential(): 
+    global user
     choices = int(input("Edit: \n[1]Name \n[2]Password \n[3]Phone \n[4]Email \nEnter choice: "))
     while choices not in [1,2,3,4]:
         print('Invalid input.')
@@ -642,7 +644,7 @@ def edit_credential():
         while value == '' or fetch.fetchone() != None:
             print("Username has been taken")
             value = str(input("Enter name: "))
-            
+
     elif choices == 2:
         choice = "password"
         value = str(input("Enter password (at least 10 characters): "))
@@ -667,6 +669,8 @@ def edit_credential():
     c.execute(f"UPDATE CREDENTIALS set {choice}=? WHERE NAME=?", (value, user))
     print("Edit successfully. ")
     conn.commit()
+    if choices == 1:
+        user = value
     studentFeature()
             
 def edit_book():
@@ -694,16 +698,16 @@ def edit_book():
         choice_input = int(input("\nEdit: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Fiction \n[7]Amount \n[8]Publisher \n[9]Back to menu \nEnter your choice: "))
     if choice_input == 1:
         title = str(input("Edit title: "))
-        c.execute(f"UPDATE BOOKS SET TITLE = '{title}' WHERE TITLE = ?", (old_title,))
+        c.execute(f"UPDATE BOOKS SET TITLE = ? WHERE TITLE = ?", (title, old_title,))
     elif choice_input == 2:
         author = str(input("Edit author: "))
-        c.execute(f"UPDATE BOOKS SET AUTHOR = '{author}' WHERE TITLE = ?", (old_title,))
+        c.execute(f"UPDATE BOOKS SET AUTHOR = ? WHERE TITLE = ?", (author, old_title,))
     elif choice_input == 3:
         year = int(input("Edit year: "))
-        c.execute(f"UPDATE BOOKS SET YEAR = {year} WHERE TITLE = ?", (old_title,))
+        c.execute(f"UPDATE BOOKS SET YEAR = ? WHERE TITLE = ?", (year, old_title,))
     elif choice_input == 8:
         publisher = str(input("Edit publisher: "))
-        c.execute(f"UPDATE BOOKS SET PUBLISHER = '{publisher}' WHERE TITLE = ?", (old_title,))
+        c.execute(f"UPDATE BOOKS SET PUBLISHER = ? WHERE TITLE = ?", (publisher, old_title,))
     elif choice_input == 9:
         adminFeature()
     elif choice_input == 4:
@@ -741,7 +745,7 @@ def edit_book():
         seltitle = select_title.fetchone()
         for x in seltitle:
             y = x
-        find_amount = c.execute(f"SELECT ID FROM BOOKS WHERE TITLE='{y}'")
+        find_amount = c.execute(f"SELECT ID FROM BOOKS WHERE TITLE=?", (y,))
         for x in find_amount:
             ids.append(x)
         amount = len(ids)
