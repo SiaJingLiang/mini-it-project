@@ -501,7 +501,7 @@ def BorrowBook(x):
                 data.append(row)
             listing(data)
 
-            decn=input("comfirm? press any key to continue, press 'n' back to menu: ")
+            decn=input("Comfirm? Press any key to continue, press 'n' back to menu: ")
             if decn=='n' :
                 if user == "ADMIN":
                     adminFeature()
@@ -549,7 +549,6 @@ def CollectBook():
     if books == []:
         print('No books to be collected')
         adminFeature()
-
     else:
         user_input = int(input('Press [1] to proceed; Press [2] to cancel: '))
         while user_input not in [1,2]:
@@ -825,6 +824,30 @@ def id_editor(id, ori_id, title, index, value):
 
     print("ID has been updated. ")
 
+def Borrowing():
+    table = []
+    list = c.execute("SELECT * from LIST") 
+    for row in list:
+        table.append(row)
+    if table == []:
+        print('No books found')
+        adminFeature()
+    else:
+        ReturnListing(table)
+        adminFeature()
+
+def UserBorrowing():
+    table = []
+    list = c.execute("SELECT * from LIST WHERE BORROWEDBY = ?",(user,))
+    for row in list:
+        table.append(row)
+    if table == []:
+        print('No books found')
+        studentFeature()
+    else:
+        ReturnListing(table)
+        studentFeature()
+
 def main():
     global user
     login = False
@@ -855,7 +878,7 @@ def main():
         studentFeature()
 
 def studentFeature():
-    print("[1]Search Book \n[2]View status \n[3]Edit user Details \n[4]Log Out")
+    print("[1]Search Book \n[2]View status \n[3]Edit user Details \n[4]View borrowing book \n[5]Log Out")
     choice = int(input("Enter your choice:"))
     if choice == 1:
         searchBook()
@@ -874,12 +897,14 @@ def studentFeature():
                 studentFeature()
     elif choice == 3:
         edit_credential()
+    elif choice == 4:
+        UserBorrowing()
     else:
         main()
         quit()
 
 def adminFeature():
-    print("[1]Add book \n[2]Search book \n[3]Borrow Books \n[4]View Books To collect \n[5]Return Books \n[6]Edit books \n[7]Log out")
+    print("[1]Add book \n[2]Search book \n[3]Borrow Books \n[4]View Books To collect \n[5]Return Books \n[6]Edit books \n[7]View borrowed books \n[8]Log out")
     choice = int(input("Enter your choice: "))
     if choice == 1:
         addBooks()
@@ -892,7 +917,9 @@ def adminFeature():
     elif choice == 5:
         ReturnBook()
     elif choice == 6:
-        edit_book()                
+        edit_book()
+    elif choice == 7:
+        Borrowing()                
     else:
         main()
         quit()
