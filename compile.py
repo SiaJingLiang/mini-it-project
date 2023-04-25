@@ -797,7 +797,6 @@ def id_editor(id, ori_id, title, index, value):
     c.close()
     conn.close()
 
-
 def main():
     global user
     login = False
