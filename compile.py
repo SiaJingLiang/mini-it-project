@@ -895,5 +895,5 @@ def adminFeature():
     adminFeature()
 
 #main
-edit_book()
+main()
 conn.close()
