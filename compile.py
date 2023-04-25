@@ -125,7 +125,6 @@ def languagef():
         print("Invalid")
         langChoice = input("[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: ")
     language = str(languageList[langChoice-1])
-    
 
 def fictionf():
     global ficChoice, fiction
@@ -133,7 +132,7 @@ def fictionf():
     while ficChoice not in ('1', '2'):
         print("Invalid")
         ficChoice = input("[1]Fiction\n[2]Non-fiction\nEnter choice: ")
-    if ficChoice == 1:
+    if ficChoice == '1':
         fiction = str("Fiction")
     else:
         fiction = str("Non-fiction")
@@ -169,6 +168,7 @@ def idf(catChoice, langChoice, ficChoice):
             if y[0] == x:
                 x += 1
         index = x
+    print(index)
 
 def publisherf():
     global publisher
@@ -198,7 +198,6 @@ def addBooks():
     commitf(index, title, author, category, language, fiction, amount, price, publisher, year)
     print("Back to menu to make any changes. ")
     
-
 #def menu():
 def searchBook():
     choice = int(input("[1]Search Book \n[2]View All Books \n[3]Back to menu \nEnter your choice: "))
@@ -228,12 +227,10 @@ def search_menu():
             user_input = str(input(f"Enter {choice} (0 or 1): "))
         else:
             user_input = str(input(f"Enter {choice}: "))
-    library = str(f"SELECT ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PUBLISHER, YEAR FROM books WHERE {choice} LIKE '%{user_input}%'")
     #print(library)
     data = []
-    c.execute(library)
+    c.execute(f"SELECT ID, TITLE, AUTHOR, CATEGORY, LANGUAGE, FICTION, AMOUNT, PUBLISHER, YEAR FROM books WHERE {choice} LIKE ?", ("%" + user_input + "%",))
     books = c.fetchall()
-    #print(books)
     if len(books) == 0:
         print("No books found.")
     else:
@@ -673,74 +670,97 @@ def edit_credential():
     studentFeature()
             
 def edit_book():
+    books = c.execute(f"SELECT * FROM BOOKS")
+    everything = []
+    for x in books:
+        everything.append(x)
+    listing(everything)
     id = int(input("Enter id of the book to be edited: "))
+    ids = c.execute(f"SELECT ID FROM BOOKS")
+    idss = ids.fetchall()
+    while (id,) not in idss:
+        print("Invalid")
+        listing(everything)
+        id = int(input("Enter id of the book to be edited: "))
     ori_id = id
     books = c.execute(f"SELECT * FROM books WHERE ID={id}")
-    headers = ["ID", "TITLE", "AUTHOR", "CATEGORY", "LANGUAGE", "FICTION", "AVAILABILITY", "PRICE", "PUBLISHER", "YEAR"]
     data = []
     for x in books:
         data.append(x)
-    print(tabulate(data, headers=headers, tablefmt="outline"))
+    listing(data)
+    old_title = data[0][1]
     choice_input = int(input("\nEdit: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Fiction \n[7]Amount \n[8]Publisher \n[9]Back to menu \nEnter your choice: "))
     while choice_input < 1 or choice_input > 8:
         choice_input = int(input("\nEdit: \n[1]Title \n[2]Author \n[3]Year \n[4]Category \n[5]Language \n[6]Fiction \n[7]Amount \n[8]Publisher \n[9]Back to menu \nEnter your choice: "))
     if choice_input == 1:
         title = str(input("Edit title: "))
-        c.execute(f"UPDATE BOOKS SET TITLE = '{title}' WHERE ID = {id}")
+        c.execute(f"UPDATE BOOKS SET TITLE = '{title}' WHERE TITLE = ?", (old_title,))
     elif choice_input == 2:
         author = str(input("Edit author: "))
-        c.execute(f"UPDATE BOOKS SET AUTHOR = '{author}' WHERE ID = {id}")
+        c.execute(f"UPDATE BOOKS SET AUTHOR = '{author}' WHERE TITLE = ?", (old_title,))
     elif choice_input == 3:
         year = int(input("Edit year: "))
-        c.execute(f"UPDATE BOOKS SET YEAR = {year} WHERE ID = {id}")
+        c.execute(f"UPDATE BOOKS SET YEAR = {year} WHERE TITLE = ?", (old_title,))
     elif choice_input == 8:
-        publisher = int(input("Edit publisher: "))
-        c.execute(f"UPDATE BOOKS SET YEAR = {publisher} WHERE ID = {id}")
+        publisher = str(input("Edit publisher: "))
+        c.execute(f"UPDATE BOOKS SET PUBLISHER = '{publisher}' WHERE TITLE = ?", (old_title,))
     elif choice_input == 9:
         adminFeature()
     elif choice_input == 4:
-        find_title = c.execute(f"SELECT TITLE FROM BOOKS WHERE ID = {id}")
-        for x in find_title:
-            title = x[0]
-        print(title)
+        catlist = ['Literature', 'Encyclopedia', 'Guidlines', 'Motivations', 'Dictionary', 'History', 'News', 'Others']
         category = int(input("Edit category: \n[1]Literature\n[2]Encyclopedia\n[3]Guidlines\n[4]Motivations\n[5]Dictionary\n[6]History\n[7]News\n[8]Others\nEnter choice: "))
+        categ = catlist[category-1]
         index = int(0)
-        id_editor(id, ori_id, title, index, category)
+        id_editor(id, ori_id, old_title, index, category)
+        c.execute(f"UPDATE BOOKS SET CATEGORY = '{categ}' WHERE TITLE = ?", (old_title,))
     elif choice_input == 5:
+        langlist = ['English', 'Malay', 'Chinese', 'Tamil', 'Others']
         langChoice = int(input("Edit language: \n[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: "))
         while langChoice == '':
             print("Invalid")
             langChoice = int(input("Edit language: \n[1]English\n[2]Malay\n[3]Chinese\n[4]Tamil\n[5]Others\nEnter choice: "))
+        lang = langlist[langChoice-1]
         index = int(1)
-        id_editor(id, ori_id, title, index, langChoice)
+        id_editor(id, ori_id, old_title, index, langChoice)
+        c.execute(f"UPDATE BOOKS SET LANGUAGE = '{lang}' WHERE TITLE = ?", (old_title,))
     elif choice_input == 6:
         ficChoice = input("Edit fiction: \n[1]Fiction\n[2]Non-fiction\nEnter choice: ")
         while ficChoice not in ('1', '2'):
             print("Invalid")
             ficChoice = input("Edit fiction \n[1]Fiction\n[2]Non-fiction\nEnter choice: ")
         index = int(2)
-        id_editor(id, ori_id, title, index, ficChoice)
+        id_editor(id, ori_id, old_title, index, ficChoice)
+        if ficChoice == '1':
+            fict = str("Fiction")
+        else:
+            fict = str("Non-fiction")
+        c.execute(f"UPDATE BOOKS SET FICTION = '{fict}' WHERE TITLE = ?", (old_title,))
     elif choice_input == 7:
         ids = []
         select_title = c.execute(f"SELECT TITLE FROM BOOKS WHERE ID={id}")
-        find_amount = c.execute(f"SELECT ID FROM BOOOKS WHERE TITLE={select_title}")
+        seltitle = select_title.fetchone()
+        for x in seltitle:
+            y = x
+        find_amount = c.execute(f"SELECT ID FROM BOOKS WHERE TITLE='{y}'")
         for x in find_amount:
             ids.append(x)
         amount = len(ids)
         print(f"The amount is {amount}")
         new_amount = int(input("Change to: "))
         if new_amount < amount:
-            minus_amount = new_amount - amount
+            minus_amount = amount - new_amount
             i = 1
-            while i < minus_amount:
+            while i <= minus_amount:
                 largest = max(ids)
-                ids.pop(largest)
+                largest = int(largest[0])
+                ids.pop(len(ids)-1)
                 c.execute(f"DELETE FROM BOOKS WHERE ID={largest}")
                 i += 1
             conn.commit()
         else:
-            add_amount = amount - new_amount
+            add_amount = new_amount - amount
             get_details(id, add_amount)
+    conn.commit()
 
 def get_details(id, add_amount):
     details = []
@@ -752,25 +772,26 @@ def get_details(id, add_amount):
     catChoice = splited[0]
     langChoice = splited[1]
     ficChoice = splited[2]
-    index = idf(catChoice, langChoice, ficChoice)
-    title = details[1]
-    author = details[2]
-    category = details[3]
-    language = details[4]
-    fiction = details[5]
+    idf(catChoice, langChoice, ficChoice)
+    title = details[0][1]
+    author = details[0][2]
+    category = details[0][3]
+    language = details[0][4]
+    fiction = details[0][5]
     amount = add_amount
-    price = details[7]
-    publisher = details[8]
-    year = details[9]
+    price = details[0][7]
+    publisher = details[0][8]
+    year = details[0][9]
     commitf(index, title, author, category, language, fiction, amount, price, publisher, year,)
 
 def id_editor(id, ori_id, title, index, value):
     id = str(id)
     splited = [*id]
-    splited[6] = 1
+    splited[6] = '1'
     del splited[index]
     splited.insert(index, str(value))
-    new_id = int("".join(splited))
+    new_id = "".join(splited)
+    new_id = int(new_id)
     result = c.execute("SELECT ID FROM BOOKS")
     for y in result:
         if y[0] == new_id:
@@ -782,20 +803,23 @@ def id_editor(id, ori_id, title, index, value):
     for x in find_title:
         if x[0] == title:
             amount += 1
-
+    id = new_id
+    print(id)
+    print(amount)
     if int(amount) > 1:
         for i in range (1, int(amount) + 1):
-            c.execute(f"UPDATE BOOKS SET ID={id} INTO BOOKS WHERE ID ={ori_id}")
+            c.execute(f"UPDATE BOOKS SET ID={id} WHERE ID ={ori_id}")
             conn.commit()
+            id = int(id)
             id += 1
-            ori_id += 1   
+            ori_id += 1
+            print(id)
+            print(ori_id)   
     else:
-        c.execute(f"UPDATE BOOKS SET ID={id} INTO BOOKS WHERE ID ={ori_id}")
+        c.execute(f"UPDATE BOOKS SET ID={id} WHERE ID ={ori_id}")
         conn.commit()
 
     print("ID has been updated. ")
-    c.close()
-    conn.close()
 
 def main():
     global user
@@ -871,5 +895,5 @@ def adminFeature():
     adminFeature()
 
 #main
-main()
+edit_book()
 conn.close()
