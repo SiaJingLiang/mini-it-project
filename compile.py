@@ -807,21 +807,16 @@ def id_editor(id, ori_id, title, index, value):
         if x[0] == title:
             amount += 1
     id = new_id
-    print(id)
-    print(amount)
     if int(amount) > 1:
         for i in range (1, int(amount) + 1):
             c.execute(f"UPDATE BOOKS SET ID={id} WHERE ID ={ori_id}")
             conn.commit()
             id = int(id)
             id += 1
-            ori_id += 1
-            print(id)
-            print(ori_id)   
+            ori_id += 1 
     else:
         c.execute(f"UPDATE BOOKS SET ID={id} WHERE ID ={ori_id}")
         conn.commit()
-
     print("ID has been updated. ")
 
 def Borrowing():
