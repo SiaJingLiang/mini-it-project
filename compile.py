@@ -448,9 +448,15 @@ def BorrowBook(x):
         result = c.fetchone()
         while result == None:
             print("Username not found in database.")
-            username = input("Enter username:")
-            c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
-            result = c.fetchone()
+            username = input("Enter username or press 'n' back to menu:")
+            if username == 'n':
+                if user == "ADMIN":
+                    adminFeature()
+                else:
+                    studentFeature()
+            else:    
+                c.execute('SELECT NAME FROM CREDENTIALS WHERE NAME=?',(username,))
+                result = c.fetchone()
 
         c.execute('SELECT PENALTY from CREDENTIALS WHERE NAME=?',(result[0],))
         penalty = c.fetchone()[0]
@@ -817,6 +823,7 @@ def id_editor(id, ori_id, title, index, value):
     else:
         c.execute(f"UPDATE BOOKS SET ID={id} WHERE ID ={ori_id}")
         conn.commit()
+
     print("ID has been updated. ")
 
 def Borrowing():
