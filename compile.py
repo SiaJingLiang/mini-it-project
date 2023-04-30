@@ -466,6 +466,7 @@ def BorrowBook(x):
         penalty = c.fetchone()[0]
 
     if penalty != 0 :
+        username = user
         print(f"Currrently your status is not available, pay your penalty first to borrow books. \nThe amount you need to pay is: RM{penalty}")
         selcpaymtd(penalty, user, username)
     else:
