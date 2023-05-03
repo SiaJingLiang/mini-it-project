@@ -1,5 +1,6 @@
 import sqlite3
 import time
+import os
 from datetime import datetime, timedelta
 from tabulate import tabulate
 conn = sqlite3.connect('database.db')
@@ -903,6 +904,7 @@ def studentFeature():
     elif choice == 4:
         UserBorrowing()
     else:
+        os.system('cls')
         main()
         quit()
 
@@ -924,6 +926,7 @@ def adminFeature():
     elif choice == 7:
         Borrowing()                
     else:
+        os.system('cls')
         main()
         quit()
     adminFeature()
